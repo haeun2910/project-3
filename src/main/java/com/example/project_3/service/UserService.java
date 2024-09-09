@@ -139,8 +139,8 @@ public class UserService implements UserDetailsService {
     public void applyForBusiness(Long id){
         Optional<User> user = repository.findById(id);
 
-        if (user.get().getAuthorities() != "ROLE_USER"){
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        if (user.isPresent() && !"ROLE_USER".equals(user.get().getAuthorities())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only users with role USER can apply for business");
         }
         user.get().setBusinessApplication(true);
         repository.save(user.get());
@@ -150,20 +150,22 @@ public class UserService implements UserDetailsService {
     }
     public void approveBusinessApplication(Long id){
         Optional<User> user = repository.findById(id);
-        if (user.get().isBusinessApplication() && user.get().getAuthorities() == "ROLE_USER"){
+        if (user.isPresent() && user.get().isBusinessApplication() && "ROLE_USER".equals(user.get().getAuthorities())) {
             user.get().setAuthorities("ROLE_BUSINESS");
             user.get().setBusinessApplication(false);
             repository.save(user.get());
+        } else {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cannot approve application for this user");
         }
-        else throw new ResponseStatusException(HttpStatus.FORBIDDEN);
     }
     public void rejectBusinessApplication(Long id){
         Optional<User> user = repository.findById(id);
-        if (user.get().isBusinessApplication() && user.get().getAuthorities() == "ROLE_USER"){
+        if (user.isPresent() && user.get().isBusinessApplication() && "ROLE_USER".equals(user.get().getAuthorities())) {
             user.get().setBusinessApplication(false);
             repository.save(user.get());
+        } else {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cannot reject application for this user");
         }
-        else throw new ResponseStatusException(HttpStatus.FORBIDDEN);
     }
     public void checkIfAdmin(User user){
         if (user.getAuthorities().equals("ROLE_ADMIN")){

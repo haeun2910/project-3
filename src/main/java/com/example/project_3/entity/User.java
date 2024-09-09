@@ -25,9 +25,6 @@ public class User extends BaseEntity {
     // 사용자 전환 신청 여부
     private boolean businessApplication;
 
-    public boolean isActiveUser(){
-        return this.authorities != "ROLE_DEFAULT";
-    }
 }
 
 

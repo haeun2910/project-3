@@ -58,27 +58,30 @@ public class UserController {
         service.delete(deleteId);
     }
     @PostMapping("apply-business")
-    public ResponseEntity<String> applyForBusiness(){
+    public String applyForBusiness() {
         Long updateId = service.getUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName()).getId();
         service.applyForBusiness(updateId);
-        return ResponseEntity.ok("apply successful");
+        return "apply successful";
     }
+
     @GetMapping("business-application")
-    public ResponseEntity<List<User>> getBusinessApplications(){
+    public List<User> getBusinessApplications() {
         List<User> businessApplications = service.getBusinessApplications();
-        return ResponseEntity.ok(businessApplications);
+        return businessApplications;
     }
+
     @PostMapping("approve-business")
-    public ResponseEntity<String> approveBusiness(){
+    public String approveBusiness() {
         Long approveId = service.getUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName()).getId();
         service.approveBusinessApplication(approveId);
-        return ResponseEntity.ok("Approved");
+        return "Approved";
     }
+
     @PostMapping("reject-business")
-    public ResponseEntity<String> rejectBusiness(){
+    public String rejectBusiness() {
         Long rejectId = service.getUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName()).getId();
         service.rejectBusinessApplication(rejectId);
-        return ResponseEntity.ok("Rejected");
+        return "Rejected";
     }
 
 }

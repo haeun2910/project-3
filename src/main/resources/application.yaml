@@ -21,6 +21,12 @@ spring:
 #              - name
 #              - email
 #              - nickname
+  servlet:
+    multipart:
+      # 개별 파일의 크기 제한
+      max-file-size: 10MB
+      # 전체 총 요청 크기 제한
+      max-request-size: 20MB
   mvc:
     static-path-pattern: /static/**
   datasource:
@@ -30,7 +36,7 @@ spring:
     password: password
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: create-drop
     database-platform: org.hibernate.community.dialect.SQLiteDialect
     show-sql: true
     defer-datasource-initialization: true

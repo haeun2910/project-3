@@ -32,10 +32,12 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers("/error", "/token/issue", "/views/**","/static/**", "/test/**")
                             .permitAll();
-                    auth.requestMatchers("/users/create")
-                                    .anonymous();
-                    auth.anyRequest()
-                            .authenticated();
+                    auth.requestMatchers("/users/my-profile", "/users/update","/users/image", "/users/delete").authenticated();
+                    auth.requestMatchers("/users/create").anonymous();
+                    auth.requestMatchers("/default-role").hasRole("DEFAULT");
+                    auth.requestMatchers("/admin-role").hasRole("ADMIN");
+                    auth.requestMatchers("/user-role").hasRole("USER");
+                    auth.requestMatchers("/owner-role").hasRole("OWNER");
                 })
                 .addFilterBefore(
                         new JwtTokenFilter(

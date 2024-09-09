@@ -32,12 +32,8 @@ public class JwtTokenUtils {
     }
 
     public String generateToken(UserDetails userDetails) {
-        // JWT를 만들때는 보통 3가지 정보를 포함시킨다.
-        // iat: issued at
-        // sub: 대상자
-        // exp: expire at
+
         Instant now = Instant.now();
-        // JWT의 payload (body)에 포함되는 데이터는 claim이라고 부른다.
         Claims jwtClaims = Jwts.claims()
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(Date.from(now))

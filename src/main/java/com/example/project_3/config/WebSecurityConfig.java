@@ -32,8 +32,8 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers("/error", "/token/issue", "/views/**","/static/**", "/test/**")
                             .permitAll();
-                    auth.requestMatchers("/articles/**")
-                            .permitAll();
+                    auth.requestMatchers("/users/create")
+                                    .anonymous();
                     auth.anyRequest()
                             .authenticated();
                 })
@@ -43,6 +43,15 @@ public class WebSecurityConfig {
                                 userService
                         ),
                         AuthorizationFilter.class
+                )
+                .formLogin(formLogin -> formLogin
+                        .loginPage("/users/login")
+                        .defaultSuccessUrl("/users/my-profile")
+                        .failureUrl("/users/login?fail")
+                        .permitAll())
+                .logout(logout -> logout
+                        .logoutUrl("/users/logout")
+                        .logoutSuccessUrl("/users/login")
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));

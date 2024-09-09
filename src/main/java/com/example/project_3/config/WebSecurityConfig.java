@@ -32,12 +32,21 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers("/error", "/token/issue", "/views/**","/static/**", "/test/**")
                             .permitAll();
-                    auth.requestMatchers("/users/my-profile", "/users/update","/users/image", "/users/delete").authenticated();
+                    auth.requestMatchers("/users/my-profile",
+                                    "/users/update",
+                                    "/users/image",
+                                    "/users/delete",
+                                    "/users/approve-business",
+                                    "/users/business-application",
+                                    "/users/reject-business",
+                                    "/users/apply-business"
+                                    )
+                            .authenticated();
                     auth.requestMatchers("/users/create").anonymous();
                     auth.requestMatchers("/default-role").hasRole("DEFAULT");
                     auth.requestMatchers("/admin-role").hasRole("ADMIN");
-                    auth.requestMatchers("/user-role").hasRole("USER");
-                    auth.requestMatchers("/owner-role").hasRole("OWNER");
+                    auth.requestMatchers("/user-role","/users/apply-business").hasRole("USER");
+                    auth.requestMatchers("/business-role").hasRole("BUSINESS");
                 })
                 .addFilterBefore(
                         new JwtTokenFilter(

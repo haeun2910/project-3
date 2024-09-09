@@ -41,8 +41,9 @@ public class UserDto {
         dto.email = entity.getEmail();
         dto.phone = entity.getPhone();
         dto.profileImgUrl = entity.getProfileImgUrl();
-        dto.authorities = entity.getAuthorities();
         return dto;
 
     }
+
+
 }

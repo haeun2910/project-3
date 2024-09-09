@@ -7,6 +7,7 @@ import com.example.project_3.repo.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -20,6 +21,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -132,6 +134,41 @@ public class UserService implements UserDetailsService {
         if (repository.existsById(id))
             repository.deleteById(id);
         else throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+    }
+
+    public void applyForBusiness(Long id){
+        Optional<User> user = repository.findById(id);
+
+        if (user.get().getAuthorities() != "ROLE_USER"){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+        user.get().setBusinessApplication(true);
+        repository.save(user.get());
+    }
+    public List<User> getBusinessApplications(){
+        return repository.findByBusinessApplicationTrueAndAuthorities("ROLE_USER");
+    }
+    public void approveBusinessApplication(Long id){
+        Optional<User> user = repository.findById(id);
+        if (user.get().isBusinessApplication() && user.get().getAuthorities() == "ROLE_USER"){
+            user.get().setAuthorities("ROLE_BUSINESS");
+            user.get().setBusinessApplication(false);
+            repository.save(user.get());
+        }
+        else throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+    }
+    public void rejectBusinessApplication(Long id){
+        Optional<User> user = repository.findById(id);
+        if (user.get().isBusinessApplication() && user.get().getAuthorities() == "ROLE_USER"){
+            user.get().setBusinessApplication(false);
+            repository.save(user.get());
+        }
+        else throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+    }
+    public void checkIfAdmin(User user){
+        if (user.getAuthorities().equals("ROLE_ADMIN")){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
     }
 
 }

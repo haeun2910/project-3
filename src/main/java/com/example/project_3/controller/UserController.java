@@ -1,13 +1,17 @@
 package com.example.project_3.controller;
 
 import com.example.project_3.UserDto;
+import com.example.project_3.entity.User;
 import com.example.project_3.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -36,7 +40,7 @@ public class UserController {
             @RequestBody UserDto userDto
 
     ){
-        log.info(service.getUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName()).getId().toString());
+
         Long updateId = service.getUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName()).getId();
         return service.updateProfile(updateId, userDto);
     }
@@ -52,6 +56,29 @@ public class UserController {
     public void delete(){
         Long deleteId = service.getUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName()).getId();
         service.delete(deleteId);
+    }
+    @PostMapping("apply-business")
+    public ResponseEntity<String> applyForBusiness(){
+        Long updateId = service.getUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName()).getId();
+        service.applyForBusiness(updateId);
+        return ResponseEntity.ok("apply successful");
+    }
+    @GetMapping("business-application")
+    public ResponseEntity<List<User>> getBusinessApplications(){
+        List<User> businessApplications = service.getBusinessApplications();
+        return ResponseEntity.ok(businessApplications);
+    }
+    @PostMapping("approve-business")
+    public ResponseEntity<String> approveBusiness(){
+        Long approveId = service.getUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName()).getId();
+        service.approveBusinessApplication(approveId);
+        return ResponseEntity.ok("Approved");
+    }
+    @PostMapping("reject-business")
+    public ResponseEntity<String> rejectBusiness(){
+        Long rejectId = service.getUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName()).getId();
+        service.rejectBusinessApplication(rejectId);
+        return ResponseEntity.ok("Rejected");
     }
 
 }

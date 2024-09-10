@@ -81,7 +81,7 @@ public class UserController {
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @PostMapping("reject-business/**")
+    @PostMapping("reject-business/{userId}")
     public String rejectBusiness(@PathVariable Long userId) {
         service.rejectBusinessApplication(userId);
         return "Rejected";

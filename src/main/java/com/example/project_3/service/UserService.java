@@ -54,6 +54,28 @@ public class UserService implements UserDetailsService {
         hanh.setAuthorities("ROLE_DEFAULT");
         this.repository.save(alex);
 
+        User chad = new User();
+        chad.setUsername("chad");
+        chad.setPassword(passwordEncoder.encode("password"));
+        chad.setAuthorities("ROLE_USER");
+        chad.setNickname("chad123");
+        chad.setFullName("Chad Tran");
+        chad.setAgeGroup(40);
+        chad.setEmail("chad@gmail.com");
+        chad.setPhone("01063452269");
+        this.repository.save(chad);
+
+        User tran = new User();
+        tran.setUsername("tranLam");
+        tran.setPassword(passwordEncoder.encode("password"));
+        tran.setNickname("wuan");
+        tran.setFullName("LAMHUYENTRAN");
+        tran.setAgeGroup(20);
+        tran.setEmail("huyentran@gmail.com");
+        tran.setPhone("01043920027");
+        tran.setAuthorities("ROLE_BUSINESS");
+        this.repository.save(tran);
+
     }
 
     // CREATE
@@ -102,6 +124,14 @@ public class UserService implements UserDetailsService {
         target.setEmail(dto.getEmail());
         target.setPhone(dto.getPhone());
         target.setAgeGroup(dto.getAgeGroup());
+        if (dto.getNickname() == null ||
+                dto.getFullName() == null ||
+                dto.getEmail() == null ||
+                dto.getPhone() == null ||
+                dto.getAgeGroup() == null
+        ){
+            target.setAuthorities("ROLE_DEFAULT");
+        }
         target.setAuthorities("ROLE_USER");
         return UserDto.fromEntity(repository.save(target));
     }

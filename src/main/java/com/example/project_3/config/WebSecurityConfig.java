@@ -39,14 +39,16 @@ public class WebSecurityConfig {
                                     "/users/approve-business/**",
                                     "/users/business-application",
                                     "/users/reject-business/**",
-                                    "/users/apply-business"
+                                    "/users/apply-business",
+                                    "/shops/**"
                                     )
                             .authenticated();
                     auth.requestMatchers("/users/create").anonymous();
                     auth.requestMatchers("/default-role").hasRole("DEFAULT");
-                    auth.requestMatchers("/admin-role").hasRole("ADMIN");
+                    auth.requestMatchers("/admin-role","/admin/**").hasRole("ADMIN");
                     auth.requestMatchers("/user-role").hasRole("USER");
-                    auth.requestMatchers("/business-role").hasRole("BUSINESS");
+                    auth.requestMatchers("/business-role","/shops/update").hasRole("BUSINESS");
+                    auth.anyRequest().authenticated();
                 })
                 .addFilterBefore(
                         new JwtTokenFilter(

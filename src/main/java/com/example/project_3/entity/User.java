@@ -1,7 +1,11 @@
 package com.example.project_3.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -24,6 +28,9 @@ public class User extends BaseEntity {
 
     // 사용자 전환 신청 여부
     private boolean businessApplication;
+    @OneToMany(mappedBy = "owner",fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private final List<Shop> ownedShops = new ArrayList<>();
 
 }
 

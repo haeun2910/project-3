@@ -9,6 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -146,9 +148,11 @@ public class UserService implements UserDetailsService {
         repository.save(user.get());
     }
     public List<User> getBusinessApplications(){
+        checkIfAdmin();
         return repository.findByBusinessApplicationTrueAndAuthorities("ROLE_USER");
     }
     public void approveBusinessApplication(Long id){
+        checkIfAdmin();
         Optional<User> user = repository.findById(id);
         if (user.isPresent() && user.get().isBusinessApplication() && "ROLE_USER".equals(user.get().getAuthorities())) {
             user.get().setAuthorities("ROLE_BUSINESS");
@@ -159,6 +163,7 @@ public class UserService implements UserDetailsService {
         }
     }
     public void rejectBusinessApplication(Long id){
+        checkIfAdmin();
         Optional<User> user = repository.findById(id);
         if (user.isPresent() && user.get().isBusinessApplication() && "ROLE_USER".equals(user.get().getAuthorities())) {
             user.get().setBusinessApplication(false);
@@ -167,9 +172,10 @@ public class UserService implements UserDetailsService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cannot reject application for this user");
         }
     }
-    public void checkIfAdmin(User user){
-        if (user.getAuthorities().equals("ROLE_ADMIN")){
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+    private void checkIfAdmin() {
+        String currentUserRole = SecurityContextHolder.getContext().getAuthentication().getAuthorities().toString();
+        if (!currentUserRole.contains("ROLE_ADMIN")) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have admin privileges");
         }
     }
 

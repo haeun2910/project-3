@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -64,23 +65,25 @@ public class UserController {
         return "apply successful";
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("business-application")
     public List<User> getBusinessApplications() {
         List<User> businessApplications = service.getBusinessApplications();
         return businessApplications;
     }
 
-    @PostMapping("approve-business")
-    public String approveBusiness() {
-        Long approveId = service.getUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName()).getId();
-        service.approveBusinessApplication(approveId);
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PostMapping("approve-business/{userId}")
+    public String approveBusiness(@PathVariable Long userId) {
+        service.approveBusinessApplication(userId);
         return "Approved";
+
     }
 
-    @PostMapping("reject-business")
-    public String rejectBusiness() {
-        Long rejectId = service.getUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName()).getId();
-        service.rejectBusinessApplication(rejectId);
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PostMapping("reject-business/**")
+    public String rejectBusiness(@PathVariable Long userId) {
+        service.rejectBusinessApplication(userId);
         return "Rejected";
     }
 

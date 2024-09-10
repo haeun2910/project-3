@@ -73,4 +73,32 @@ public class ShopController {
             return ResponseEntity.status(ex.getStatusCode()).body(ex.getReason());
         }
     }
+    @PostMapping("/close-request")
+    @PreAuthorize("hasRole('ROLE_BUSINESS')")
+    public ResponseEntity<String> requestShopClose(@RequestParam Long shopId, @RequestParam String reason) {
+        try {
+            shopService.requestShopClose(shopId, reason);
+            return ResponseEntity.ok("Shop closure request submitted with reason: " + reason);
+        } catch (ResponseStatusException ex) {
+            return ResponseEntity.status(ex.getStatusCode()).body(ex.getReason());
+        }
+    }
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @GetMapping("/close-requests")
+    public ResponseEntity<List<Shop>> getCloseRequests() {
+        List<Shop> closeRequestedShops = shopService.getShopsWithCloseRequests();
+        return ResponseEntity.ok(closeRequestedShops);
+    }
+    @PostMapping("/approve-close/{shopId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<String> approveShopClosure(@PathVariable Long shopId) {
+        try {
+            shopService.approveShopClose(shopId);
+            return ResponseEntity.ok("Shop closure approved.");
+        } catch (ResponseStatusException ex) {
+            return ResponseEntity.status(ex.getStatusCode()).body(ex.getReason());
+        }
+    }
+
+
 }

@@ -20,6 +20,8 @@ public class Shop extends BaseEntity{
     private String category;
     private boolean openStatus;
     private boolean applicationSubmitted;
+    private boolean closeRequested;
+    private String closeReason;
     @OneToMany(mappedBy = "shopItem", fetch = FetchType.LAZY)
     private final List<Item> items = new ArrayList<>();
 

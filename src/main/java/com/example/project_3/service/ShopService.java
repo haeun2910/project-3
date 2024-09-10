@@ -59,6 +59,7 @@ public class ShopService {
         if (userOptional.isPresent()) {
             shop.setOpenStatus(false);
             shop.setApplicationSubmitted(true);
+            shop.setOwner(userOptional.get());
             return shopRepository.save(shop);
         }
         else throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User does not have permission");
@@ -92,6 +93,47 @@ public class ShopService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid shop rejection request");
         }
     }
+    public void requestShopClose(Long shopId, String reason) {
+        Optional<Shop> shopOptional = shopRepository.findById(shopId);
+        if (shopOptional.isPresent()) {
+            Shop shop = shopOptional.get();
+            if (shop.getOwner() == null) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Shop owner not found");
+            }
+            if (!shop.getOwner().getAuthorities().contains("ROLE_BUSINESS")) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User does not have permission to close this shop");
+            }
+            // Set close request details
+            shop.setCloseRequested(true);
+            shop.setCloseReason(reason);
+            shopRepository.save(shop);
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Shop not found");
+        }
+    }
+
+    public List<Shop> getShopsWithCloseRequests() {
+        checkIfAdmin();
+        return shopRepository.findByCloseRequestedTrue();
+    }
+
+    public void approveShopClose(Long shopId) {
+        Optional<Shop> shopOptional = shopRepository.findById(shopId);
+        if (shopOptional.isPresent()) {
+            Shop shop = shopOptional.get();
+            if (shop.isCloseRequested()) {
+                // 쇼핑몰을 폐쇄 상태로 변경
+                shop.setOpenStatus(false);
+                shop.setCloseRequested(false);  // 요청 상태 해제
+                shopRepository.save(shop);
+            } else {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No close request found for this shop");
+            }
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Shop not found");
+        }
+    }
+
     private void checkIfAdmin() {
         String currentUserRole = SecurityContextHolder.getContext().getAuthentication().getAuthorities().toString();
         if (!currentUserRole.contains("ROLE_ADMIN")) {

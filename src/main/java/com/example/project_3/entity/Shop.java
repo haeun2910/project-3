@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,6 +32,9 @@ public class Shop extends BaseEntity{
     @JoinColumn(name = "user_id")
     @JsonBackReference
     private User owner;
+
+    @Column(name = "recent_transaction")
+    private LocalDateTime recentTransaction;
 
 
 

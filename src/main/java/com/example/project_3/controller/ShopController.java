@@ -99,6 +99,19 @@ public class ShopController {
             return ResponseEntity.status(ex.getStatusCode()).body(ex.getReason());
         }
     }
+    // Retrieve all active shops sorted by recent transactions
+    @GetMapping("/all")
+    public ResponseEntity<List<Shop>> getAllShops() {
+        List<Shop> shops = shopService.getAllActiveShopsSortedByRecentTransactions();
+        return ResponseEntity.ok(shops);
+    }
 
+    // Search shops by name or category
+    @GetMapping("/search")
+    public ResponseEntity<List<Shop>> searchShops(@RequestParam(required = false) String name,
+                                                  @RequestParam(required = false) String category) {
+        List<Shop> shops = shopService.searchShops(name, category);
+        return ResponseEntity.ok(shops);
+    }
 
 }

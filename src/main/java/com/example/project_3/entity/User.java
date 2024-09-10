@@ -28,6 +28,8 @@ public class User extends BaseEntity {
 
     // 사용자 전환 신청 여부
     private boolean businessApplication;
+
+    private boolean active;
     @OneToMany(mappedBy = "owner",fetch = FetchType.LAZY)
     @JsonManagedReference
     private final List<Shop> ownedShops = new ArrayList<>();

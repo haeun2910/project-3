@@ -40,7 +40,8 @@ public class WebSecurityConfig {
                                     "/users/business-application",
                                     "/users/reject-business/**",
                                     "/users/apply-business",
-                                    "/shops/**"
+                                    "/shops/**",
+                                    "products/**"
                                     )
                             .authenticated();
                     auth.requestMatchers("/users/create").anonymous();

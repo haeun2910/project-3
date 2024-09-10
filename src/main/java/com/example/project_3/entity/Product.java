@@ -1,5 +1,6 @@
 package com.example.project_3.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
@@ -13,13 +14,15 @@ import lombok.*;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-public class Item extends BaseEntity {
+public class Product extends BaseEntity {
     private String name;
+    private String image;
     private String description;
     private Double price;
     private Integer stock;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "shop_id")
-    private Shop shopItem;
+    @JsonBackReference
+    private Shop shop;
 }

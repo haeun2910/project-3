@@ -1,6 +1,7 @@
 package com.example.project_3.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -22,8 +23,9 @@ public class Shop extends BaseEntity{
     private boolean applicationSubmitted;
     private boolean closeRequested;
     private String closeReason;
-    @OneToMany(mappedBy = "shopItem", fetch = FetchType.LAZY)
-    private final List<Item> items = new ArrayList<>();
+    @OneToMany(mappedBy = "shop", fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private final List<Product> items = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")

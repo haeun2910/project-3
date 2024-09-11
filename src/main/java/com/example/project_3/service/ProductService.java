@@ -2,13 +2,20 @@ package com.example.project_3.service;
 
 import com.example.project_3.entity.Product;
 import com.example.project_3.entity.Shop;
+import com.example.project_3.entity.ShopViewLog;
+import com.example.project_3.entity.User;
 import com.example.project_3.repo.ProductRepository;
 import com.example.project_3.repo.ShopRepository;
+import com.example.project_3.repo.ShopViewRepository;
+import com.example.project_3.repo.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,9 +24,13 @@ import java.util.Optional;
 public class ProductService {
     private final ProductRepository productRepository;
     private final ShopRepository shopRepository;
-    public ProductService(ProductRepository productRepository, ShopRepository shopRepository) {
+    private final UserRepository userRepository;
+    private final ShopViewRepository shopViewRepository;
+    public ProductService(ProductRepository productRepository, ShopRepository shopRepository, UserRepository userRepository, ShopViewRepository shopViewRepository) {
         this.productRepository = productRepository;
         this.shopRepository = shopRepository;
+        this.userRepository = userRepository;
+        this.shopViewRepository = shopViewRepository;
     }
     public Product addProduct(Long shopId, Product product) {
         Optional<Shop> shopOptional = shopRepository.findById(shopId);
@@ -69,6 +80,31 @@ public class ProductService {
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Shop not found");
         }
+    }
+
+    public List<Product> searchProducts(String name, BigDecimal minPrice, BigDecimal maxPrice, Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        if ( !user.isActive()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User is not active");
+        }
+        List<Product> products = productRepository.findByNameContainingAndPriceBetweenAndShopOwnerActiveTrueAndShopOpenStatusTrueAndShopApplicationSubmittedTrue(name,minPrice,maxPrice);
+        products.forEach(product -> logShopView(product.getShop(), user));
+        return products;
+    }
+
+    private void logShopView(Shop shop, User user) {
+        ShopViewLog log = new ShopViewLog();
+        log.setShop(shop);
+        log.setUser(user);
+        log.setViewedAt(LocalDateTime.now());
+        shopViewRepository.save(log);
+    }
+
+    public List<ShopViewLog> getRecentShopViews(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        return shopViewRepository.findTop5ByUserOrderByViewedAtDesc(user);
     }
 
 

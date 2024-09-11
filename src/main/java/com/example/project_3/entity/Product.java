@@ -7,6 +7,8 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.*;
 
+import java.math.BigDecimal;
+
 
 @Getter
 @Setter
@@ -18,7 +20,7 @@ public class Product extends BaseEntity {
     private String name;
     private String image;
     private String description;
-    private Double price;
+    private BigDecimal price;
     private Integer stock;
 
     @ManyToOne(fetch = FetchType.LAZY)

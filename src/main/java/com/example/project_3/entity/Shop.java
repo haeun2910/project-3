@@ -33,9 +33,6 @@ public class Shop extends BaseEntity{
     @JsonBackReference
     private User owner;
 
-    @Column(name = "recent_transaction")
-    private LocalDateTime recentTransaction;
-
 
 
 }

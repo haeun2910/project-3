@@ -46,6 +46,7 @@ public class UserService implements UserDetailsService {
         hanh.setEmail("hanh291029@naver.com");
         hanh.setPhone("01067652699");
         hanh.setAuthorities("ROLE_ADMIN");
+        hanh.setActive(true);
         this.repository.save(hanh);
 
         User alex = new User();
@@ -63,6 +64,7 @@ public class UserService implements UserDetailsService {
         chad.setAgeGroup(40);
         chad.setEmail("chad@gmail.com");
         chad.setPhone("01063452269");
+        chad.setActive(true);
         this.repository.save(chad);
 
         User tran = new User();
@@ -74,6 +76,7 @@ public class UserService implements UserDetailsService {
         tran.setEmail("huyentran@gmail.com");
         tran.setPhone("01043920027");
         tran.setAuthorities("ROLE_BUSINESS");
+        tran.setActive(true);
         this.repository.save(tran);
 
     }

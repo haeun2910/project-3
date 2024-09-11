@@ -140,24 +140,5 @@ public class ShopService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have admin privileges");
         }
     }
-    // Retrieve all shops except for those belonging to inactive users, sorted by recent transactions
-    public List<Shop> getAllActiveShopsSortedByRecentTransactions() {
-        List<Shop> shops = shopRepository.findAllByOwnerActiveTrueOrderByRecentTransactionDesc();
-        System.out.println("Retrieved shops: " + shops);
-        return shops;
     }
 
-
-    // Search shops by name or category
-    public List<Shop> searchShops(String name, String category) {
-        if (name != null && category != null) {
-            return shopRepository.findByNameContainingAndCategoryContainingAndOwnerActiveTrue(name, category);
-        } else if (name != null) {
-            return shopRepository.findByNameContainingAndOwnerActiveTrue(name);
-        } else if (category != null) {
-            return shopRepository.findByCategoryContainingAndOwnerActiveTrue(category);
-        } else {
-            return getAllActiveShopsSortedByRecentTransactions();
-        }
-    }
-}

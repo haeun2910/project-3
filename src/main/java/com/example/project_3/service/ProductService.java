@@ -107,5 +107,4 @@ public class ProductService {
         return shopViewRepository.findTop5ByUserOrderByViewedAtDesc(user);
     }
 
-
 }

@@ -26,6 +26,7 @@ public class User extends BaseEntity {
     private String profileImgUrl;
     private String authorities;
 
+
     // 사용자 전환 신청 여부
     private boolean businessApplication;
 

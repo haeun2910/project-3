@@ -41,14 +41,16 @@ public class WebSecurityConfig {
                                     "/users/reject-business/**",
                                     "/users/apply-business",
                                     "/shops/**",
-                                    "products/**"
+                                    "/products/**",
+                                    "/purchases/**",
+                                    "/payments/**"
                                     )
                             .authenticated();
                     auth.requestMatchers("/users/create").anonymous();
                     auth.requestMatchers("/default-role").hasRole("DEFAULT");
-                    auth.requestMatchers("/admin-role","/admin/**").hasRole("ADMIN");
-                    auth.requestMatchers("/user-role").hasRole("USER");
-                    auth.requestMatchers("/business-role","/shops/update").hasRole("BUSINESS");
+                    auth.requestMatchers("/admin-role","/admin/**","/products/**").hasRole("ADMIN");
+                    auth.requestMatchers("/user-role","/products/**").hasRole("USER");
+                    auth.requestMatchers("/business-role","/shops/update","/products/**").hasRole("BUSINESS");
                     auth.anyRequest().authenticated();
                 })
                 .addFilterBefore(

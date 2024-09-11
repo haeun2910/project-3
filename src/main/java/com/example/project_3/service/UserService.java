@@ -90,14 +90,16 @@ public class UserService implements UserDetailsService {
         return UserDto.fromEntity(repository.save(newUser));
     }
     public UserDto getCurrentUserProfile() {
-        // Get the username of the currently authenticated user
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        // Fetch the user by username
         Optional<User> user = repository.findByUsername(username);
         if (user.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
         }
-        return UserDto.fromEntity(user.get());
+
+        User currentUser = user.get();
+        System.out.println("Authorities: " + currentUser.getAuthorities()); // Log the authorities
+
+        return UserDto.fromEntity(currentUser);
     }
     // read by username
     public UserDto getUserByUsername(String username) {
@@ -141,6 +143,7 @@ public class UserService implements UserDetailsService {
             target.setAuthorities("ROLE_DEFAULT");
         }
         target.setAuthorities("ROLE_USER");
+        target.setActive(true);
         return UserDto.fromEntity(repository.save(target));
     }
     // UPDATE profileImg

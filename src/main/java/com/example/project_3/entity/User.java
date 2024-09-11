@@ -41,6 +41,15 @@ public class User extends BaseEntity{
     @JsonManagedReference
     private final List<Shop> ownedShops = new ArrayList<>();
 
+    @PostLoad
+    public void updateActiveStatus() {
+        // Check the role and set the 'active' field accordingly
+        if (this.authorities.contains("ROLE_DEFAULT") || !this.authorities.isEmpty()) {
+            this.active = true;
+        } else {
+            this.active = false;
+        }
+    }
 }
 
 

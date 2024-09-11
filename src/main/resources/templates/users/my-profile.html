@@ -45,21 +45,13 @@
         .shop-list li {
             margin: 10px 0;
         }
-        .form-footer a {
-            color: #007bff;
-            text-decoration: none;
-        }
-        .form-footer a:hover {
-            color: #0056b3;
-            text-decoration: underline;
-        }
     </style>
 </head>
 <body>
 <main class="flex-shrink-0">
     <section class="profile-header">
         <div class="container">
-            <img id="profile-img" src="" alt="Profile Picture" class="profile-img">
+            <img id="profile-img" src="default-profile.png" alt="Profile Picture" class="profile-img">
             <div class="profile-details">
                 <h1 id="full-name"></h1>
                 <p>Email: <span id="email"></span></p>
@@ -75,7 +67,7 @@
             <p><strong>Email:</strong> <span id="email-details"></span></p>
             <p><strong>Phone:</strong> <span id="phone"></span></p>
             <p><strong>Authority Level:</strong> <span id="authorities"></span></p>
-            <p><strong>Business Application Submitted:</strong> <span id="business-application"></span></p>
+            <p><strong>Business Application :</strong> <span id="business-application"></span></p>
             <p><strong>Account Active:</strong> <span id="account-active"></span></p>
         </div>
 
@@ -95,7 +87,7 @@
     }
 
     fetch("/users/profile", {
-        method: "get",
+        method: "GET",
         headers: {
             "Authorization": `Bearer ${jwt}`
         },
@@ -107,36 +99,51 @@
                 localStorage.removeItem("jwt");
                 location.href = "/views/login";
             } else {
-                throw Error("Failed to fetch");
+                throw new Error("Failed to fetch");
             }
         })
         .then(user => {
-            document.getElementById("profile-img").src = user.profileImgUrl || "default-profile.png"; // Ensure default image if URL is missing
-            document.getElementById("full-name").textContent = user.fullName;
-            document.getElementById("email").textContent = user.email;
-            document.getElementById("username").textContent = user.username;
-            document.getElementById("username-details").textContent = user.username;
-            document.getElementById("email-details").textContent = user.email;
-            document.getElementById("phone").textContent = user.phone || "N/A"; // Handle missing data
-            document.getElementById("authorities").textContent = user.authorities.join(", ");
-            document.getElementById("business-application").textContent = user.businessApplication ? 'Yes' : 'No';
+            console.log(user); // Log the user object to verify data
+
+            // Update profile image
+            const profileImg = document.getElementById("profile-img");
+            profileImg.src = user.profileImgUrl || "profile.png";
+
+            // Update user details
+            document.getElementById("full-name").textContent = user.fullName || "N/A";
+            document.getElementById("email").textContent = user.email || "N/A";
+            document.getElementById("username").textContent = user.username || "N/A";
+            document.getElementById("username-details").textContent = user.username || "N/A";
+            document.getElementById("email-details").textContent = user.email || "N/A";
+            document.getElementById("phone").textContent = user.phone || "N/A";
+            document.getElementById("authorities").textContent = user.authorities || "N/A";
+
+
+            // Correctly interpret and display account active status
             document.getElementById("account-active").textContent = user.active ? 'Active' : 'Inactive';
 
+            // Update list of owned shops
             const shopList = document.getElementById("shop-list");
-            user.ownedShops.forEach(shop => {
-                const li = document.createElement('li');
-                li.innerHTML = `
-                    <strong>Shop Name:</strong> ${shop.name} <br>
-                    <strong>Description:</strong> ${shop.description} <br>
-                    <strong>Category:</strong> ${shop.category}
-                `;
-                shopList.appendChild(li);
-            });
+            if (user.ownedShops && user.ownedShops.length > 0) {
+                user.ownedShops.forEach(shop => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `
+            <strong>Shop Name:</strong> ${shop.name || "N/A"} <br>
+            <strong>Description:</strong> ${shop.description || "N/A"} <br>
+            <strong>Category:</strong> ${shop.category || "N/A"}
+        `;
+                    shopList.appendChild(li);
+                });
+            } else {
+                shopList.innerHTML = "<li>No shops owned.</li>";
+            }
         })
-        .catch(e => {
-            console.error(e);
-            // Optionally, you can add an error message to the page
+
+            .catch(error => {
+            console.error("Error fetching user profile:", error);
+            // Optionally, display an error message to the user
         });
 </script>
+
 </body>
 </html>

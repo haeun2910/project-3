@@ -29,6 +29,10 @@ public class UserDto {
     private String profileImgUrl;
     @Setter
     private String authorities;
+    @Setter
+    private boolean active;
+    @Setter
+    private boolean businessApplication;
 
     public static UserDto fromEntity(User entity) {
         UserDto dto = new UserDto();
@@ -41,6 +45,9 @@ public class UserDto {
         dto.email = entity.getEmail();
         dto.phone = entity.getPhone();
         dto.profileImgUrl = entity.getProfileImgUrl();
+        dto.authorities = entity.getAuthorities();
+        dto.active = entity.isActive();
+        dto.businessApplication = entity.isBusinessApplication();
         return dto;
 
     }

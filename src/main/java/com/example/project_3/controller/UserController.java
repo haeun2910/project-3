@@ -3,14 +3,19 @@ package com.example.project_3.controller;
 import com.example.project_3.UserDto;
 import com.example.project_3.entity.User;
 import com.example.project_3.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -22,18 +27,24 @@ public class UserController {
     private final UserService service;
 
 
-    @GetMapping("/my-profile")
-    public String getMyProfile() {
-        return "my-profile";
-
-
+    @PostMapping("/create")
+    public ResponseEntity<UserDto> createUser(@RequestBody UserDto userDto) {
+        try {
+            UserDto createdUser = service.createUser(userDto);
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
+        } catch (ResponseStatusException e) {
+            // Handle known exceptions
+            return ResponseEntity.status(e.getStatusCode()).body(null);
+        } catch (Exception e) {
+            // Handle unexpected exceptions
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
-    @PostMapping("/create")
-    public UserDto createUser(
-            @RequestBody UserDto userDto
-    ) {
-        return service.createUser(userDto);
+    @GetMapping("/profile")
+    public ResponseEntity<UserDto> getCurrentUserProfile() {
+        UserDto userProfile = service.getCurrentUserProfile();
+        return ResponseEntity.ok(userProfile);
     }
 
     @PutMapping("/update")

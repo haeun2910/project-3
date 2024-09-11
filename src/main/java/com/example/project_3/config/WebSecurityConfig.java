@@ -2,12 +2,14 @@ package com.example.project_3.config;
 
 import com.example.project_3.jwt.JwtTokenFilter;
 import com.example.project_3.jwt.JwtTokenUtils;
+import com.example.project_3.oauth.OAuth2UserServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.intercept.AuthorizationFilter;
 
@@ -15,12 +17,15 @@ import org.springframework.security.web.access.intercept.AuthorizationFilter;
 public class WebSecurityConfig {
     private final JwtTokenUtils tokenUtils;
     private final UserDetailsService userService;
+    private final OAuth2UserServiceImpl oAuth2UserService;
     public WebSecurityConfig(
             JwtTokenUtils tokenUtils,
-            UserDetailsService userService
+            UserDetailsService userService,
+            OAuth2UserServiceImpl oAuth2UserService
     ) {
         this.tokenUtils = tokenUtils;
         this.userService = userService;
+        this.oAuth2UserService = oAuth2UserService;
     }
 
     @Bean
@@ -46,7 +51,7 @@ public class WebSecurityConfig {
                                     "/payments/**"
                                     )
                             .authenticated();
-                    auth.requestMatchers("/users/create").anonymous();
+                    auth.requestMatchers("/users/create","/users/signup").anonymous();
                     auth.requestMatchers("/default-role").hasRole("DEFAULT");
                     auth.requestMatchers("/admin-role","/admin/**","/products/**").hasRole("ADMIN");
                     auth.requestMatchers("/user-role","/products/**").hasRole("USER");
@@ -65,6 +70,12 @@ public class WebSecurityConfig {
                         .defaultSuccessUrl("/users/my-profile")
                         .failureUrl("/users/login?fail")
                         .permitAll())
+                .oauth2Login(oauth2Login -> oauth2Login
+                        .loginPage("/users/login")
+                        .defaultSuccessUrl("/users/my-profile")
+                        .userInfoEndpoint(userInfo -> userInfo.userService(oAuth2UserService))
+                        .permitAll()
+                )
                 .logout(logout -> logout
                         .logoutUrl("/users/logout")
                         .logoutSuccessUrl("/users/login")

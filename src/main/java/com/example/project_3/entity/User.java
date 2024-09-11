@@ -3,9 +3,14 @@ package com.example.project_3.entity;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -14,7 +19,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class User extends BaseEntity {
+public class User extends BaseEntity{
 
     private String username;
     private String password;
@@ -25,6 +30,7 @@ public class User extends BaseEntity {
     private String phone;
     private String profileImgUrl;
     private String authorities;
+
 
 
     // 사용자 전환 신청 여부

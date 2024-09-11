@@ -4,19 +4,14 @@ package com.example.project_3.service;
 import com.example.project_3.UserDto;
 import com.example.project_3.entity.User;
 import com.example.project_3.repo.UserRepository;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -37,47 +32,47 @@ public class UserService implements UserDetailsService {
         this.passwordEncoder = passwordEncoder;
         this.repository = repository;
 
-        User hanh = new User();
-        hanh.setUsername("haeun");
-        hanh.setPassword(passwordEncoder.encode("123456"));
-        hanh.setNickname("haeun29");
-        hanh.setFullName("이하은");
-        hanh.setAgeGroup(20);
-        hanh.setEmail("hanh291029@naver.com");
-        hanh.setPhone("01067652699");
-        hanh.setAuthorities("ROLE_ADMIN");
-        hanh.setActive(true);
-        this.repository.save(hanh);
-
-        User alex = new User();
-        alex.setUsername("alex");
-        alex.setPassword(passwordEncoder.encode("password"));
-        hanh.setAuthorities("ROLE_DEFAULT");
-        this.repository.save(alex);
-
-        User chad = new User();
-        chad.setUsername("chad");
-        chad.setPassword(passwordEncoder.encode("password"));
-        chad.setAuthorities("ROLE_USER");
-        chad.setNickname("chad123");
-        chad.setFullName("Chad Tran");
-        chad.setAgeGroup(40);
-        chad.setEmail("chad@gmail.com");
-        chad.setPhone("01063452269");
-        chad.setActive(true);
-        this.repository.save(chad);
-
-        User tran = new User();
-        tran.setUsername("tranLam");
-        tran.setPassword(passwordEncoder.encode("password"));
-        tran.setNickname("wuan");
-        tran.setFullName("LAMHUYENTRAN");
-        tran.setAgeGroup(20);
-        tran.setEmail("huyentran@gmail.com");
-        tran.setPhone("01043920027");
-        tran.setAuthorities("ROLE_BUSINESS");
-        tran.setActive(true);
-        this.repository.save(tran);
+//        User hanh = new User();
+//        hanh.setUsername("haeun");
+//        hanh.setPassword(passwordEncoder.encode("123456"));
+//        hanh.setNickname("haeun29");
+//        hanh.setFullName("이하은");
+//        hanh.setAgeGroup(20);
+//        hanh.setEmail("hanh291029@naver.com");
+//        hanh.setPhone("01067652699");
+//        hanh.setAuthorities("ROLE_ADMIN");
+//        hanh.setActive(true);
+//        this.repository.save(hanh);
+//
+//        User alex = new User();
+//        alex.setUsername("alex");
+//        alex.setPassword(passwordEncoder.encode("password"));
+//        hanh.setAuthorities("ROLE_DEFAULT");
+//        this.repository.save(alex);
+//
+//        User chad = new User();
+//        chad.setUsername("chad");
+//        chad.setPassword(passwordEncoder.encode("password"));
+//        chad.setAuthorities("ROLE_USER");
+//        chad.setNickname("chad123");
+//        chad.setFullName("Chad Tran");
+//        chad.setAgeGroup(40);
+//        chad.setEmail("chad@gmail.com");
+//        chad.setPhone("01063452269");
+//        chad.setActive(true);
+//        this.repository.save(chad);
+//
+//        User tran = new User();
+//        tran.setUsername("tranLam");
+//        tran.setPassword(passwordEncoder.encode("password"));
+//        tran.setNickname("wuan");
+//        tran.setFullName("LAMHUYENTRAN");
+//        tran.setAgeGroup(20);
+//        tran.setEmail("huyentran@gmail.com");
+//        tran.setPhone("01043920027");
+//        tran.setAuthorities("ROLE_BUSINESS");
+//        tran.setActive(true);
+//        this.repository.save(tran);
 
     }
 
@@ -93,6 +88,16 @@ public class UserService implements UserDetailsService {
         newUser.setPassword(passwordEncoder.encode(dto.getPassword()));
         newUser.setAuthorities("ROLE_DEFAULT");
         return UserDto.fromEntity(repository.save(newUser));
+    }
+    public UserDto getCurrentUserProfile() {
+        // Get the username of the currently authenticated user
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        // Fetch the user by username
+        Optional<User> user = repository.findByUsername(username);
+        if (user.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
+        }
+        return UserDto.fromEntity(user.get());
     }
     // read by username
     public UserDto getUserByUsername(String username) {

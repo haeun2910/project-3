@@ -66,19 +66,19 @@ public class WebSecurityConfig {
                         AuthorizationFilter.class
                 )
                 .formLogin(formLogin -> formLogin
-                        .loginPage("/users/login")
-                        .defaultSuccessUrl("/users/my-profile")
+                        .loginPage("/views/login")
+                        .defaultSuccessUrl("/views/my-profile")
                         .failureUrl("/users/login?fail")
                         .permitAll())
                 .oauth2Login(oauth2Login -> oauth2Login
-                        .loginPage("/users/login")
-                        .defaultSuccessUrl("/users/my-profile")
+                        .loginPage("/views/login")
+                        .defaultSuccessUrl("/views/my-profile")
                         .userInfoEndpoint(userInfo -> userInfo.userService(oAuth2UserService))
                         .permitAll()
                 )
                 .logout(logout -> logout
-                        .logoutUrl("/users/logout")
-                        .logoutSuccessUrl("/users/login")
+                        .logoutUrl("/views/logout")
+                        .logoutSuccessUrl("/views/login")
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));

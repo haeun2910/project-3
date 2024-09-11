@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Arial', sans-serif;
+        }
+        .profile-header {
+            background-color: #007bff;
+            color: white;
+            padding: 30px 0;
+            text-align: center;
+        }
+        .profile-img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid #fff;
+        }
+        .profile-details {
+            margin-top: -75px;
+            text-align: center;
+        }
+        .profile-details h1 {
+            margin: 15px 0;
+            font-size: 28px;
+        }
+        .profile-details p {
+            color: #6c757d;
+            font-size: 16px;
+        }
+        .profile-section {
+            padding: 20px;
+            background-color: white;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .profile-section img {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+<main class="flex-shrink-0">
+    <section class="profile-header">
+        <div class="container">
+            <img id="profile-img" src="/default-profile.png" alt="Profile Picture" class="profile-img">
+            <div class="profile-details">
+                <h1 id="full-name"></h1>
+                <p>Email: <span id="email"></span></p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Profile Information Form -->
+    <div class="container">
+        <div class="profile-section">
+            <h2>Update Profile Information</h2>
+            <form id="update-profile-form">
+                <div class="mb-3">
+                    <label for="full-name-input" class="form-label">Full Name</label>
+                    <input type="text" class="form-control" id="full-name-input" name="fullName" required>
+                </div>
+                <div class="mb-3">
+                    <label for="username-input" class="form-label">Username</label>
+                    <input type="text" class="form-control" id="username-input" name="username" required>
+                </div>
+                <div class="mb-3">
+                    <label for="email-input" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="email-input" name="email" required>
+                </div>
+                <div class="mb-3">
+                    <label for="nickname-input" class="form-label">Nickname</label>
+                    <input type="text" class="form-control" id="nickname-input" name="nickname">
+                </div>
+                <div class="mb-3">
+                    <label for="phone-input" class="form-label">Phone</label>
+                    <input type="text" class="form-control" id="phone-input" name="phone">
+                </div>
+                <div class="mb-3">
+                    <label for="password-input" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="password-input" name="password" minlength="6">
+                </div>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+            </form>
+        </div>
+
+        <!-- Profile Image Upload Section -->
+        <div class="profile-section">
+            <h2>Update Profile Image</h2>
+            <form id="upload-form">
+                <input type="file" id="profile-image" accept="image/*" class="form-control mb-2" required>
+                <img id="image-preview" src="" alt="Image Preview" class="mb-2" style="display: none;">
+                <button type="submit" class="btn btn-primary">Upload Image</button>
+            </form>
+        </div>
+    </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const jwt = localStorage.getItem("jwt");
+    if (!jwt) {
+        location.href = "/views/login";
+    }
+
+    // Fetch user profile
+    fetch("/users/profile", {
+        method: "GET",
+        headers: {
+            "Authorization": `Bearer ${jwt}`
+        },
+    })
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            } else if (response.status === 403) {
+                localStorage.removeItem("jwt");
+                location.href = "/views/login";
+            } else {
+                throw new Error("Failed to fetch");
+            }
+        })
+        .then(user => {
+            console.log(user); // Log the user object to verify data
+
+            // Populate input fields with existing data
+            document.getElementById("full-name-input").value = user.fullName || "";
+            document.getElementById("username-input").value = user.username || "";
+            document.getElementById("email-input").value = user.email || "";
+            document.getElementById("nickname-input").value = user.nickname || "";
+            document.getElementById("phone-input").value = user.phone || "";
+
+            // Update profile image
+            const profileImg = document.getElementById("profile-img");
+            profileImg.src = user.profileImgUrl || "default-profile.png";
+        })
+        .catch(error => {
+            console.error("Error fetching user profile:", error);
+        });
+
+    // Handle profile update
+    document.getElementById("update-profile-form").addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        const updatedUser = {
+            fullName: document.getElementById("full-name-input").value,
+            username: document.getElementById("username-input").value,
+            email: document.getElementById("email-input").value,
+            nickname: document.getElementById("nickname-input").value,
+            phone: document.getElementById("phone-input").value,
+            password: document.getElementById("password-input").value
+        };
+
+        fetch("/users/update-profile", {
+            method: "PUT", // Assuming your backend expects PUT for updates
+            headers: {
+                "Authorization": `Bearer ${jwt}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(updatedUser)
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error("Failed to update profile");
+                }
+            })
+            .then(data => {
+                alert("Profile updated successfully!");
+                // Optionally, refresh the page or update UI with new profile data
+            })
+            .catch(error => {
+                console.error("Error updating profile:", error);
+                alert("Failed to update profile. Please try again.");
+            });
+    });
+
+    // Handle image upload
+    document.getElementById("upload-form").addEventListener("submit", function (event) {
+        event.preventDefault();
+        const fileInput = document.getElementById("profile-image");
+        const file = fileInput.files[0];
+        if (!file) {
+            alert("Please select an image to upload.");
+            return;
+        }
+        const formData = new FormData();
+        formData.append("image", file);
+
+        fetch("/users/profile-image", {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${jwt}`
+            },
+            body: formData
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error("Failed to upload image");
+                }
+            })
+            .then(data => {
+                // Update the profile image on the page
+                const profileImg = document.getElementById("profile-img");
+                profileImg.src = data.profileImgUrl; // Updated image URL
+
+                // Optionally, you can also update the image URL in local storage or session
+            })
+            .catch(error => {
+                console.error("Error uploading image:", error);
+                alert("Failed to upload image. Please try again.");
+            });
+    });
+
+    // Preview the selected image before uploading
+    document.getElementById("profile-image").addEventListener("change", function () {
+        const fileInput = document.getElementById("profile-image");
+        const file = fileInput.files[0];
+        const preview = document.getElementById("image-preview");
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                preview.src = e.target.result;
+                preview.style.display = "block";
+            };
+            reader.readAsDataURL(file);
+        } else {
+            preview.style.display = "none";
+        }
+    });
+</script>
+
+</body>
+</html>

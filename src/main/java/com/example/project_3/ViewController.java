@@ -20,4 +20,8 @@ public class ViewController {
     public String myProfile() {
         return "/users/my-profile.html";
     }
+    @GetMapping("user-update")
+    public String update() {
+        return "/users/update.html";
+    }
 }

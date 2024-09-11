@@ -152,7 +152,7 @@ public class UserService implements UserDetailsService {
         if (optionalUser.isEmpty()){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
-        String profileDir = "media/" + id + "/";
+        String profileDir = "src/main/resources/static/media/" + id + "/";
         try {
             Files.createDirectories(Path.of(profileDir));
         }catch (IOException e){
@@ -167,7 +167,7 @@ public class UserService implements UserDetailsService {
         }catch (IOException e){
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        String reqPath = "/static/" + id + "/profile." + extension;
+        String reqPath = "/media/" + id + "/profile." + extension;
         User targetImg = optionalUser.get();
         targetImg.setProfileImgUrl(reqPath);
         return UserDto.fromEntity(repository.save(targetImg));

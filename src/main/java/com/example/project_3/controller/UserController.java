@@ -47,7 +47,7 @@ public class UserController {
         return ResponseEntity.ok(userProfile);
     }
 
-    @PutMapping("/update")
+    @PutMapping("/update-profile")
     public UserDto updateProfile(
             @RequestBody UserDto userDto
 
@@ -56,7 +56,7 @@ public class UserController {
         Long updateId = service.getUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName()).getId();
         return service.updateProfile(updateId, userDto);
     }
-    @PutMapping("/image")
+    @PostMapping("/profile-image")
     public UserDto updateImg(
             MultipartFile image
     ){

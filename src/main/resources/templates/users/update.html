@@ -70,10 +70,6 @@
                     <input type="text" class="form-control" id="full-name-input" name="fullName" required>
                 </div>
                 <div class="mb-3">
-                    <label for="username-input" class="form-label">Username</label>
-                    <input type="text" class="form-control" id="username-input" name="username" required>
-                </div>
-                <div class="mb-3">
                     <label for="email-input" class="form-label">Email</label>
                     <input type="email" class="form-control" id="email-input" name="email" required>
                 </div>
@@ -153,7 +149,6 @@
 
         const updatedUser = {
             fullName: document.getElementById("full-name-input").value,
-            username: document.getElementById("username-input").value,
             email: document.getElementById("email-input").value,
             nickname: document.getElementById("nickname-input").value,
             phone: document.getElementById("phone-input").value,
@@ -178,6 +173,7 @@
             .then(data => {
                 alert("Profile updated successfully!");
                 // Optionally, refresh the page or update UI with new profile data
+                window.location.href = "/views/my-profile";
             })
             .catch(error => {
                 console.error("Error updating profile:", error);
@@ -217,6 +213,7 @@
                 profileImg.src = data.profileImgUrl; // Updated image URL
 
                 // Optionally, you can also update the image URL in local storage or session
+                window.location.href = "/views/my-profile";
             })
             .catch(error => {
                 console.error("Error uploading image:", error);

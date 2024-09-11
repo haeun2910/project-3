@@ -15,6 +15,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -162,9 +166,25 @@ public class UserService implements UserDetailsService {
         String[] fileNameSplit = originalFileName.split("\\.");
         String extension = fileNameSplit[fileNameSplit.length - 1];
         String uploadPath = profileDir + "profile." + extension;
-        try{
-            image.transferTo(Path.of(uploadPath));
-        }catch (IOException e){
+        try {
+            BufferedImage bufferedImage = ImageIO.read(image.getInputStream());
+
+            // Define crop dimensions (e.g., 200x200)
+            int cropWidth = 200;
+            int cropHeight = 200;
+
+            BufferedImage croppedImage = new BufferedImage(cropWidth, cropHeight, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g2d = croppedImage.createGraphics();
+
+            // Calculate the center of the original image
+            int x = (bufferedImage.getWidth() - cropWidth) / 2;
+            int y = (bufferedImage.getHeight() - cropHeight) / 2;
+
+            g2d.drawImage(bufferedImage, 0, 0, cropWidth, cropHeight, x, y, x + cropWidth, y + cropHeight, null);
+            g2d.dispose();
+
+            ImageIO.write(croppedImage, extension, new File(uploadPath));
+        } catch (IOException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
         }
         String reqPath = "/media/" + id + "/profile." + extension;

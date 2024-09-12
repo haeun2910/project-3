@@ -24,6 +24,12 @@ public class ShopService {
         this.shopRepository = shopRepository;
         this.userRepository = userRepository;
     }
+    public List<Shop> getAllShops() {
+        return shopRepository.findAll();
+    }
+    public List<Shop> getAllOpenedShops(){
+        return shopRepository.findByOpenStatusTrue();
+    }
 
     public Shop updateShopForBusinessUser(Long userId, Shop shop) {
         Optional<User> userOptional = userRepository.findById(userId);
@@ -55,15 +61,33 @@ public class ShopService {
         if (shop.getCategory() == null || shop.getCategory().isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Shop category cannot be empty");
         }
+
+        // Check if the shop already exists
+        Optional<Shop> existingShopOptional = shopRepository.findById(shop.getId());
+        if (existingShopOptional.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Shop does not exist");
+        }
+
+        Shop existingShop = existingShopOptional.get();
+
+        // Ensure the shop is not already in the "open" status
+        if (existingShop.isOpenStatus()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Shop is already open");
+        }
+
+        // Ensure the user exists
         Optional<User> userOptional = userRepository.findById(userId);
         if (userOptional.isPresent()) {
-            shop.setOpenStatus(false);
-            shop.setApplicationSubmitted(true);
-            shop.setOwner(userOptional.get());
-            return shopRepository.save(shop);
+            existingShop.setOpenStatus(false);  // Still in application phase
+            existingShop.setApplicationSubmitted(true);  // Mark the shop as applied for opening
+            existingShop.setOwner(userOptional.get());  // Assign the user as the owner
+
+            return shopRepository.save(existingShop);  // Save changes and return updated shop
+        } else {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User does not have permission");
         }
-        else throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User does not have permission");
     }
+
     // get application list
     public List<Shop> getApplicationShops() {
         checkIfAdmin();

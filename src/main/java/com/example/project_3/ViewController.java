@@ -12,16 +12,43 @@ public class ViewController {
     public String test() {
         return "test";
     }
+
     @GetMapping("/login")
     public String login() {
         return "/users/login-form.html";
     }
+
     @GetMapping("my-profile")
     public String myProfile() {
         return "/users/my-profile.html";
     }
+
     @GetMapping("user-update")
     public String update() {
         return "/users/update.html";
+    }
+
+    @GetMapping("/signup")
+    public String signup() {
+        return "/users/sign-up-form.html";
+    }
+
+    @GetMapping("shop-list")
+    public String shopList() {
+        return "/shops/shop-list.html";
+    }
+
+    @GetMapping("home-page")
+    public String homePage() {
+        return "/shops/home-page.html";
+    }
+    @GetMapping("signin-home-page")
+    public String signinHomePage() {
+        return "/shops/signin-home-page.html";
+    }
+
+    @GetMapping("get-shop")
+    public String getShop() {
+        return "/shops/shop-profile.html";
     }
 }

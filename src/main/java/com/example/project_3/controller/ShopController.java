@@ -22,6 +22,27 @@ public class ShopController {
         this.shopService = shopService;
 
     }
+    @PreAuthorize("hasAnyRole('ROLE_BUSINESS','ROLE_ADMIN')")
+    @GetMapping("all-shops")
+    public List<Shop> getAllShops() {
+        return shopService.getAllShops();
+    }
+
+    @GetMapping("opened-shop")
+    public ResponseEntity<List<Shop>> getOpenedShops() {
+        List<Shop> shops = shopService.getAllOpenedShops();
+        return ResponseEntity.ok(shops);
+    }
+    @GetMapping("/get-shop/{id}")
+    public ResponseEntity<Shop> getOpenedShopById(@PathVariable Long id) {
+        try {
+            Shop shop = shopService.getShopById(id);
+            return new ResponseEntity<>(shop, HttpStatus.OK);
+        } catch (ResponseStatusException e) {
+            // Handle exceptions and return appropriate error responses
+            return new ResponseEntity<>(null, e.getStatusCode());
+        }
+    }
 
     @PreAuthorize("hasRole('ROLE_BUSINESS')")
     @PutMapping("/update")
@@ -37,12 +58,15 @@ public class ShopController {
 
     @PreAuthorize("hasRole('ROLE_BUSINESS')")
     @PostMapping("open-apply")
-    public ResponseEntity<Shop> createShop(@RequestParam Long userId, @RequestBody Shop shop) {
+    public ResponseEntity<?> createShop(@RequestParam Long userId, @RequestBody Shop shop) {
         try {
             Shop openApply = shopService.openApply(userId, shop);
             return ResponseEntity.ok(openApply);
         } catch (ResponseStatusException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            return ResponseEntity.status(e.getStatusCode()).body(e.getReason());  // Return the specific error status and message
+        } catch (Exception e) {
+            // Handle other unexpected exceptions
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred");
         }
     }
 

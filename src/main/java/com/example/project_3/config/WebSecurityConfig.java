@@ -35,7 +35,7 @@ public class WebSecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> {
-                    auth.requestMatchers("/error", "/token/issue", "/views/**","/static/**", "/test/**")
+                    auth.requestMatchers("/error", "/token/issue", "/views/**","/static/**", "/test/**","/shops/opened-shop")
                             .permitAll();
                     auth.requestMatchers("/users/my-profile",
                                     "/users/update",
@@ -67,18 +67,19 @@ public class WebSecurityConfig {
                 )
                 .formLogin(formLogin -> formLogin
                         .loginPage("/views/login")
-                        .defaultSuccessUrl("/views/my-profile")
+                        .defaultSuccessUrl("/views/signin-home-page")
                         .failureUrl("/users/login?fail")
                         .permitAll())
                 .oauth2Login(oauth2Login -> oauth2Login
                         .loginPage("/views/login")
-                        .defaultSuccessUrl("/views/my-profile")
+                        .defaultSuccessUrl("/views/signin-home-page")
                         .userInfoEndpoint(userInfo -> userInfo.userService(oAuth2UserService))
                         .permitAll()
                 )
                 .logout(logout -> logout
                         .logoutUrl("/views/logout")
                         .logoutSuccessUrl("/views/login")
+
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));

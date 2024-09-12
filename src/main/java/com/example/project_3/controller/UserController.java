@@ -65,8 +65,9 @@ public class UserController {
     }
     @DeleteMapping("/delete")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(){
-        Long deleteId = service.getUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName()).getId();
+    public void delete() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        Long deleteId = service.getUserByUsername(username).getId();
         service.delete(deleteId);
     }
     @PostMapping("apply-business")

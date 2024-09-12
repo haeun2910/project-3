@@ -91,6 +91,7 @@ public class UserService implements UserDetailsService {
         newUser.setUsername(dto.getUsername());
         newUser.setPassword(passwordEncoder.encode(dto.getPassword()));
         newUser.setAuthorities("ROLE_DEFAULT");
+        newUser.setActive(false);
         return UserDto.fromEntity(repository.save(newUser));
     }
     public UserDto getCurrentUserProfile() {

@@ -9,5 +9,6 @@ import java.util.List;
 public interface ShopRepository extends JpaRepository<Shop, Long> {
     List<Shop> findByApplicationSubmittedTrueAndOpenStatusFalse();
     List<Shop> findByCloseRequestedTrue();
+    List<Shop> findByOpenStatusTrue();
 
 }

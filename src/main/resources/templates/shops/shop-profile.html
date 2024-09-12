@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Shop Profile</title>
+</head>
+<body>
+<h1 id="shop-name">Shop Name</h1>
+<h3 id="shop-category">Shop Category</h3>
+<p id="shop-description">Shop Description</p>
+
+<h2>Products</h2>
+<table>
+  <thead>
+  <tr>
+    <th>ID</th>
+    <th>Name</th>
+    <th>Description</th>
+    <th>Price</th>
+  </tr>
+  </thead>
+  <tbody id="products-table-body">
+  <!-- Product data will be inserted here by JavaScript -->
+  </tbody>
+</table>
+
+<script>
+  // Get JWT from local storage
+  const jwt = localStorage.getItem("jwt");
+
+  // Redirect to login page if JWT is not present
+  if (!jwt) {
+    location.href = "/views/home-page";
+  }
+
+  // Extract shop ID from the URL path
+  const pathSplit = location.pathname.split("/");
+  const shopId = pathSplit[pathSplit.length - 1];
+
+  // Fetch shop details from the server
+  fetch(`/shops/get-shop/${shopId}`, {
+    method: "GET",
+    headers: {
+      "Authorization": `Bearer ${jwt}`
+    },
+  })
+          .then(response => {
+            console.log(response.status);
+            if (response.ok) {
+              return response.json();
+            } else if (response.status === 403) {
+              localStorage.removeItem("jwt");
+              location.href = "/views/login";
+            } else {
+              throw new Error("Failed to fetch");
+            }
+          })
+          .then(json => {
+            console.log(json);
+            // Update HTML with shop data
+            document.getElementById("shop-name").textContent = json.name || "Shop Name not available";
+            document.getElementById("shop-category").textContent = json.category || "Category not available";
+            document.getElementById("shop-description").textContent = json.description || "Description not available";
+
+            // Populate products table
+            const tableBody = document.getElementById('products-table-body');
+            tableBody.innerHTML = ''; // Clear existing content
+
+            if (json.products && Array.isArray(json.products)) {
+              json.products.forEach(product => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${product.id}</td>
+                    <td>${product.name}</td>
+                    <td>${product.description}</td>
+                    <td>${product.price}</td>
+                `;
+                tableBody.appendChild(row);
+              });
+            } else {
+              tableBody.innerHTML = '<tr><td colspan="4">No products available.</td></tr>';
+            }
+          })
+          .catch(e => {
+            console.error(e);
+            // Optionally display an error message on the page
+            document.getElementById("shop-name").textContent = "Error loading shop";
+            document.getElementById("shop-category").textContent = "";
+            document.getElementById("shop-description").textContent = "Unable to fetch shop content.";
+          });
+
+</script>
+</body>
+</html>

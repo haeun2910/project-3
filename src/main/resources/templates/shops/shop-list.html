@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shop List</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #f8f9fa;
+      font-family: 'Arial', sans-serif;
+    }
+    .container {
+      margin-top: 50px;
+    }
+    .shop-card {
+      padding: 20px;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+    }
+    .shop-card h3 {
+      margin-bottom: 10px;
+    }
+    .shop-card p {
+      margin: 5px 0;
+    }
+    .shop-status {
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>List of Shops</h1>
+  <div id="shop-list"></div>
+</div>
+
+<script>
+  const jwt = localStorage.getItem("jwt");
+  if (!jwt) {
+    location.href = "/views/home-page"; // Redirect to login if not authenticated
+  }
+
+  // Fetch all shops from the backend
+  fetch("/shops/all-shops", {
+    method: "GET",
+    headers: {
+      "Authorization": `Bearer ${jwt}`,
+      "Content-Type": "application/json"
+    }
+  })
+          .then(response => {
+            if (response.ok) {
+              return response.json();
+            } else if (response.status === 403) {
+              localStorage.removeItem("jwt");
+              location.href = "/views/login";
+            } else {
+              throw new Error("Failed to fetch shops");
+            }
+          })
+          .then(shops => {
+            const shopList = document.getElementById("shop-list");
+
+            if (shops.length === 0) {
+              shopList.innerHTML = "<p>No shops available.</p>";
+            } else {
+              shops.forEach(shop => {
+                const shopCard = document.createElement("div");
+                shopCard.className = "shop-card";
+
+                shopCard.innerHTML = `
+                        <h3>${shop.name || "No name available"}</h3>
+                        <p><strong>Description:</strong> ${shop.description || "No description available"}</p>
+                        <p><strong>Category:</strong> ${shop.category || "Uncategorized"}</p>
+                        <p><strong>Open Status:</strong> ${shop.openStatus ? "Opened" : "Ready to open"}</p>
+                        <p><strong>Application Submitted:</strong> ${shop.applicationSubmitted ? "Yes" : "No"}</p>
+                        <p><strong>Close Requested:</strong> ${shop.closeRequested ? "Yes" : "No"}</p>
+                        <p><strong>Close Reason:</strong> ${shop.closeReason || "N/A"}</p>
+                    `;
+
+                shopList.appendChild(shopCard);
+              });
+            }
+          })
+          .catch(error => {
+            console.error("Error fetching shops:", error);
+            document.getElementById("shop-list").innerHTML = "<p>Error loading shops.</p>";
+          });
+</script>
+</body>
+</html>

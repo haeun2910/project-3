@@ -80,7 +80,7 @@
                             <a href="/oauth2/authorization/naver">네이버 로그인</a>
                         </div>
                         <div class="text-muted">
-                            <a href="/users/signup">회원가입</a>
+                            <a href="/views/signup">회원가입</a>
                         </div>
                     </div>
                     <div class="error-message" id="errorMessage"></div>
@@ -93,7 +93,7 @@
 <script>
     // Redirect if JWT already exists
     if (localStorage.getItem("jwt")) {
-        location.href = "/views/my-profile";
+        location.href = "/views/signin-home-page";
     }
 
     // Get form and input elements
@@ -133,7 +133,7 @@
             .then(json => {
                 // Save JWT and redirect
                 localStorage.setItem("jwt", json.token);
-                location.href = "/views/my-profile";
+                location.href = "/views/signin-home-page";
             })
             .catch(e => {
                 // Display error message

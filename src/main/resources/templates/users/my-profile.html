@@ -61,6 +61,7 @@
             </div>
         </div>
     </section>
+    <a href="/views/signin-home-page">HOME PAGE</a>
 
     <!-- User Information Section -->
     <div class="container">
@@ -76,6 +77,9 @@
 
             <!-- Update Profile Button -->
             <button id="update-profile-btn" class="btn btn-primary btn-update">Update Profile</button>
+
+            <!-- Delete Account Button -->
+            <button id="delete-account-btn" class="btn btn-danger btn-delete">Delete Account</button>
         </div>
 
         <!-- List of Owned Shops -->
@@ -153,6 +157,31 @@
     // Handle the Update Profile button click
     document.getElementById("update-profile-btn").addEventListener("click", function() {
         window.location.href = "/views/user-update"; // Replace with the actual URL of your update profile page
+    });
+
+    // Handle Delete Account button click
+    document.getElementById("delete-account-btn").addEventListener("click", function() {
+        if (confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
+            fetch("/users/delete", {
+                method: "DELETE",
+                headers: {
+                    "Authorization": `Bearer ${jwt}`
+                }
+            })
+                .then(response => {
+                    if (response.ok) {
+                        alert("Account deleted successfully.");
+                        localStorage.removeItem("jwt");
+                        location.href = "/views/login"; // Redirect to login after deletion
+                    } else {
+                        throw new Error("Failed to delete account.");
+                    }
+                })
+                .catch(error => {
+                    console.error("Error deleting account:", error);
+                    alert("Failed to delete account. Please try again.");
+                });
+        }
     });
 </script>
 

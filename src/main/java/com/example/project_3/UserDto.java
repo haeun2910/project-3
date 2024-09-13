@@ -1,9 +1,13 @@
 package com.example.project_3;
 
+import com.example.project_3.entity.Shop;
 import com.example.project_3.entity.User;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @ToString
@@ -33,6 +37,8 @@ public class UserDto {
     private boolean active;
     @Setter
     private boolean businessApplication;
+    @Setter
+    private List<ShopDetails> ownedShops;
 
     public static UserDto fromEntity(User entity) {
         UserDto dto = new UserDto();
@@ -48,6 +54,9 @@ public class UserDto {
         dto.authorities = entity.getAuthorities();
         dto.active = entity.isActive();
         dto.businessApplication = entity.isBusinessApplication();
+        if (entity.getShops() != null) {
+            dto.setOwnedShops(entity.getShops().stream().map(ShopDetails::fromEntity).collect(Collectors.toList()));
+        }
         return dto;
 
     }

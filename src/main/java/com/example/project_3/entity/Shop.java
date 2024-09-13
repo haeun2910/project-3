@@ -35,4 +35,7 @@ public class Shop extends BaseEntity{
 
 
 
+
+
+
 }

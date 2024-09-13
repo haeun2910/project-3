@@ -62,6 +62,7 @@
         </div>
     </section>
     <a href="/views/signin-home-page">HOME PAGE</a>
+    <button id="logout-button" >LOG OUT</button>
 
     <!-- User Information Section -->
     <div class="container">
@@ -72,7 +73,6 @@
             <p><strong>Phone:</strong> <span id="phone"></span></p>
             <p><strong>Nickname:</strong> <span id="nickname"></span></p>
             <p><strong>Authority Level:</strong> <span id="authorities"></span></p>
-            <p><strong>Business Application:</strong> <span id="business-application"></span></p>
             <p><strong>Account Active:</strong> <span id="account-active"></span></p>
 
             <!-- Update Profile Button -->
@@ -86,6 +86,10 @@
 
             <!-- View Business Applications Button (only for ROLE_ADMIN) -->
             <button id="view-applications-btn" class="btn btn-warning">View Business Applications</button>
+
+            <!-- View Not Open Shops Button (only for ROLE_BUSINESS and ROLE_ADMIN) -->
+            <button id="view-not-open-shops-btn" class="btn btn-info">View Not Open Shops</button>
+
         </div>
 
         <!-- List of Owned Shops -->
@@ -100,7 +104,7 @@
 <script>
     const jwt = localStorage.getItem("jwt");
     if (!jwt) {
-        location.href = "/views/login";
+        location.href = "/views/home-page";
     }
 
     // Fetch user profile details
@@ -136,7 +140,7 @@
             document.getElementById("phone").textContent = user.phone || "N/A";
             document.getElementById("nickname").textContent = user.nickname || "N/A";
             document.getElementById("authorities").textContent = user.authorities || "N/A";
-            document.getElementById("business-application").textContent = user.businessApplication ? "Applied" : "Not Applied";
+
             document.getElementById("account-active").textContent = user.active ? 'Active' : 'Inactive';
 
             // Update list of owned shops
@@ -214,6 +218,11 @@
         window.location.href = "/views/user-update"; // Replace with the actual URL of your update profile page
     });
 
+    // Handle the View Not Open Shops button click
+    document.getElementById("view-not-open-shops-btn").addEventListener("click", function () {
+        window.location.href = "/views/not-open-shops"; // Redirect to the not open shops page
+    });
+
     // Handle Delete Account button click
     document.getElementById("delete-account-btn").addEventListener("click", function () {
         if (confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
@@ -238,6 +247,18 @@
                 });
         }
     });
+    // Function to handle logout
+    function handleLogout() {
+        // Remove the JWT token from storage (localStorage or sessionStorage)
+        localStorage.removeItem('jwt'); // or sessionStorage.removeItem('jwt');
+
+        // Redirect to the home page
+        window.location.href = '/views/home-page';
+    }
+
+    // Attach the logout handler to the logout button
+    document.getElementById('logout-button').addEventListener('click', handleLogout);
+
 </script>
 
 </body>

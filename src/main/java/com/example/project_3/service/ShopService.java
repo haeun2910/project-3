@@ -24,8 +24,8 @@ public class ShopService {
         this.shopRepository = shopRepository;
         this.userRepository = userRepository;
     }
-    public List<Shop> getAllShops() {
-        return shopRepository.findAll();
+    public List<Shop> getNotOpenShops() {
+        return shopRepository.findByOpenStatusTrue();
     }
     public List<Shop> getAllOpenedShops(){
         return shopRepository.findByOpenStatusTrue();
@@ -69,27 +69,22 @@ public class ShopService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Shop category cannot be empty");
         }
 
-        // Check if the shop already exists
         Optional<Shop> existingShopOptional = shopRepository.findById(shop.getId());
         if (existingShopOptional.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Shop does not exist");
         }
 
         Shop existingShop = existingShopOptional.get();
-
-        // Ensure the shop is not already in the "open" status
         if (existingShop.isOpenStatus()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Shop is already open");
         }
 
-        // Ensure the user exists
         Optional<User> userOptional = userRepository.findById(userId);
         if (userOptional.isPresent()) {
-            existingShop.setOpenStatus(false);  // Still in application phase
-            existingShop.setApplicationSubmitted(true);  // Mark the shop as applied for opening
-            existingShop.setOwner(userOptional.get());  // Assign the user as the owner
-
-            return shopRepository.save(existingShop);  // Save changes and return updated shop
+            existingShop.setOpenStatus(false);
+            existingShop.setApplicationSubmitted(true);
+            existingShop.setOwner(userOptional.get());
+            return shopRepository.save(existingShop);
         } else {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User does not have permission");
         }
@@ -103,15 +98,31 @@ public class ShopService {
 
     public void approveShop(Long shopId) {
         checkIfAdmin();
-        Optional<Shop> shop = shopRepository.findById(shopId);
-        if (shop.isPresent() && shop.get().isApplicationSubmitted()) {
-            shop.get().setOpenStatus(true); // 오픈 상태로 변경
-            shop.get().setApplicationSubmitted(false); // 신청 상태 해제
-            shopRepository.save(shop.get());
+
+        Optional<Shop> shopOptional = shopRepository.findById(shopId);
+        if (shopOptional.isPresent()) {
+            Shop shop = shopOptional.get();
+
+            if (shop.isApplicationSubmitted()) {
+                User applicant = shop.getOwner(); // Get the user who applied
+
+                if (applicant != null) {
+                    shop.setOpenStatus(true); // Set shop to open status
+                    shop.setApplicationSubmitted(false); // Remove application status
+                    shop.setOwner(applicant); // Set the owner to the applicant
+
+                    shopRepository.save(shop);
+                } else {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Applicant not found");
+                }
+            } else {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Shop application not submitted");
+            }
         } else {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid shop approval request");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Shop not found");
         }
     }
+
 
     public void rejectShop(Long shopId, String reason) {
         checkIfAdmin();

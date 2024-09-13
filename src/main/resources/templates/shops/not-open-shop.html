@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Not Open Shops</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Arial', sans-serif;
+        }
+        .page-header {
+            background-color: #007bff;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .shop-list-item {
+            margin-bottom: 15px;
+            padding: 15px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .shop-list-item h5 {
+            margin: 0;
+        }
+        .shop-list-item p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+<div class="page-header">
+    <h1>Not Open Shops</h1>
+</div>
+<div class="container mt-4">
+    <div id="not-open-shop-list"></div>
+    <button id="back-button" class="btn btn-secondary">Back to Profile</button>
+</div>
+
+<script>
+    const jwt = localStorage.getItem("jwt");
+    if (!jwt) {
+        location.href = "/views/home-page";
+    }
+
+    // Fetch not open shops
+    fetch("/shops/not-open-shop", {
+        method: "GET",
+        headers: {
+            "Authorization": `Bearer ${jwt}`
+        },
+    })
+        .then(response => response.json())
+        .then(shops => {
+            const shopList = document.getElementById("not-open-shop-list");
+            if (shops && shops.length > 0) {
+                shops.forEach(shop => {
+                    const div = document.createElement('div');
+                    div.className = 'shop-list-item';
+                    div.innerHTML = `
+                            <h5>${shop.name || "N/A"}</h5>
+                            <p><strong>Description:</strong> ${shop.description || "N/A"}</p>
+                            <p><strong>Category:</strong> ${shop.category || "N/A"}</p>
+                            <p><strong>Status:</strong> Not Open</p>
+
+                        `;
+                    shopList.appendChild(div);
+                });
+
+                // Add event listeners to all "Apply to Open" buttons
+                document.querySelectorAll(".apply-button").forEach(button => {
+                    button.addEventListener("click", function () {
+                        const shopId = this.getAttribute("data-shop-id");
+                        applyToOpenShop(shopId);
+                    });
+                });
+            } else {
+                shopList.innerHTML = "<p>No not open shops available.</p>";
+            }
+        })
+        .catch(error => {
+            console.error("Error fetching not open shops:", error);
+            alert("Failed to load not open shops. Please try again later.");
+        });
+</script>
+</body>
+</html>

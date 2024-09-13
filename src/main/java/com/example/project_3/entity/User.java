@@ -39,7 +39,7 @@ public class User extends BaseEntity{
     private boolean active;
     @OneToMany(mappedBy = "owner",fetch = FetchType.LAZY)
     @JsonManagedReference
-    private final List<Shop> ownedShops = new ArrayList<>();
+    private final List<Shop> shops = new ArrayList<>();
 
 //    @PostLoad
 //    public void updateActiveStatus() {

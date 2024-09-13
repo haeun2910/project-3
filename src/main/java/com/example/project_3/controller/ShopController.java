@@ -23,9 +23,9 @@ public class ShopController {
 
     }
     @PreAuthorize("hasAnyRole('ROLE_BUSINESS','ROLE_ADMIN')")
-    @GetMapping("all-shops")
+    @GetMapping("not-open-shop")
     public List<Shop> getAllShops() {
-        return shopService.getAllShops();
+        return shopService.getNotOpenShops();
     }
 
     @GetMapping("opened-shop")
@@ -51,18 +51,23 @@ public class ShopController {
     }
 
     @PreAuthorize("hasRole('ROLE_BUSINESS')")
-    @PostMapping("open-apply")
+    @PostMapping("/open-apply")
     public ResponseEntity<?> createShop(@RequestParam Long userId, @RequestBody Shop shop) {
         try {
             Shop openApply = shopService.openApply(userId, shop);
             return ResponseEntity.ok(openApply);
         } catch (ResponseStatusException e) {
-            return ResponseEntity.status(e.getStatusCode()).body(e.getReason());  // Return the specific error status and message
+            return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
         } catch (Exception e) {
-            // Handle other unexpected exceptions
+            // Log exception details
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred");
         }
     }
+
+
+
+
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/application-shop")
@@ -75,11 +80,15 @@ public class ShopController {
     public ResponseEntity<String> approveShop(@PathVariable Long shopId) {
         try {
             shopService.approveShop(shopId);
-            return ResponseEntity.ok("Shop approved");
+            return ResponseEntity.ok("Shop approved successfully.");
         } catch (ResponseStatusException ex) {
             return ResponseEntity.status(ex.getStatusCode()).body(ex.getReason());
+        } catch (Exception e) {
+            // Handle other possible exceptions
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred.");
         }
     }
+
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("/reject/{shopId}")

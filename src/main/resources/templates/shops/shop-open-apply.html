@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apply to Open Shop</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #f8f9fa;
+      font-family: 'Arial', sans-serif;
+    }
+    .page-header {
+      background-color: #007bff;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    .form-container {
+      max-width: 600px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .btn-submit {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+<div class="page-header">
+  <h1>Apply to Open a Shop</h1>
+</div>
+<div class="form-container">
+  <form id="apply-form">
+    <div class="mb-3">
+      <label for="shopName" class="form-label">Shop Name</label>
+      <input type="text" class="form-control" id="shopName" required>
+    </div>
+    <div class="mb-3">
+      <label for="shopDescription" class="form-label">Description</label>
+      <textarea class="form-control" id="shopDescription" rows="3" required></textarea>
+    </div>
+    <div class="mb-3">
+      <label for="shopCategory" class="form-label">Category</label>
+      <input type="text" class="form-control" id="shopCategory" required>
+    </div>
+    <input type="hidden" id="shopId" value="0"> <!-- Set this dynamically if needed -->
+    <button type="submit" class="btn btn-primary btn-submit">Apply</button>
+  </form>
+  <button id="back-button" class="btn btn-secondary mt-3">Back to Profile</button>
+</div>
+
+<script>
+  // Function to decode JWT and extract payload
+  function parseJwt(token) {
+    try {
+      const base64Url = token.split('.')[1];
+      const base64 = decodeURIComponent(atob(base64Url).split('').map(c => {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+      }).join(''));
+      return JSON.parse(base64);
+    } catch (error) {
+      console.error('Error decoding JWT', error);
+      return null;
+    }
+  }
+
+  const jwt = localStorage.getItem("jwt");
+
+  if (!jwt) {
+    location.href = "/views/login";  // Redirect to login if JWT is not available
+  }
+
+  // Extract user ID from JWT
+  const decodedToken = parseJwt(jwt);
+  const userId = decodedToken ? decodedToken.userId : null;
+
+  if (!userId) {
+    alert("User information could not be retrieved. Please log in again.");
+    location.href = "/views/login";  // Redirect to login if user ID is not available
+  }
+
+  // Handle form submission
+  document.getElementById('apply-form').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    const shopId = document.getElementById('shopId').value;
+    const shopName = document.getElementById('shopName').value;
+    const shopDescription = document.getElementById('shopDescription').value;
+    const shopCategory = document.getElementById('shopCategory').value;
+
+    fetch(`/shops/open-apply?userId=${userId}`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${jwt}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        id: shopId,  // Shop ID can be dynamically set or remain 0 for new shops
+        name: shopName,
+        description: shopDescription,
+        category: shopCategory,
+        openStatus: false,
+        applicationSubmitted: false,
+        closeRequested: false,
+        closeReason: ""
+      })
+    })
+            .then(response => {
+              if (response.ok) {
+                return response.json();
+              } else {
+                throw new Error('Failed to submit application');
+              }
+            })
+            .then(data => {
+              alert("Application to open shop successful.");
+              // Optionally redirect or update the UI after successful application
+            })
+            .catch(error => {
+              console.error("Error applying to open shop:", error);
+              alert("Failed to apply to open shop. Please try again later.");
+            });
+  });
+
+  // Handle back button click
+  document.getElementById("back-button").addEventListener("click", function() {
+    window.location.href = "/views/my-profile";  // Redirect to user profile page
+  });
+</script>
+</body>
+</html>

@@ -56,4 +56,14 @@ public class ViewController {
     public String businessApplication() {
         return "/users/business-application.html";
     }
+
+    @GetMapping("not-open-shops")
+    public String notOpenShop() {
+        return "/shops/not-open-shop.html";
+    }
+
+    @GetMapping("shop-open-apply")
+    public String shopOpenApply() {
+        return "/shops/shop-open-apply.html";
+    }
 }

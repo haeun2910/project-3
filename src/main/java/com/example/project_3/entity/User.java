@@ -37,7 +37,7 @@ public class User extends BaseEntity{
     private boolean businessApplication;
 
     private boolean active;
-    @OneToMany(mappedBy = "owner",fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user",fetch = FetchType.LAZY)
     @JsonManagedReference
     private final List<Shop> shops = new ArrayList<>();
 

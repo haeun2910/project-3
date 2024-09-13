@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Product</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #f8f9fa;
+      font-family: 'Arial', sans-serif;
+    }
+    .container {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>Add a New Product</h1>
+  <form id="add-product-form">
+    <div class="mb-3">
+      <label for="name" class="form-label">Product Name</label>
+      <input type="text" id="name" class="form-control" required>
+    </div>
+    <div class="mb-3">
+      <label for="description" class="form-label">Description</label>
+      <textarea id="description" class="form-control" rows="3"></textarea>
+    </div>
+    <div class="mb-3">
+      <label for="price" class="form-label">Price</label>
+      <input type="number" id="price" class="form-control" step="0.01" required>
+    </div>
+    <div class="mb-3">
+      <label for="stock" class="form-label">Stock</label>
+      <input type="number" id="stock" class="form-control" required>
+    </div>
+    <div class="mb-3">
+      <label for="image" class="form-label">Image URL</label>
+      <input type="url" id="image" class="form-control">
+    </div>
+    <button type="submit" class="btn btn-primary">Add Product</button>
+  </form>
+</div>
+
+<script>
+  document.getElementById('add-product-form').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    const jwt = localStorage.getItem("jwt");
+    if (!jwt) {
+      location.href = "/views/login"; // Redirect to login if JWT is not present
+      return;
+    }
+
+    const name = document.getElementById('name').value;
+    const description = document.getElementById('description').value;
+    const price = parseFloat(document.getElementById('price').value);
+    const stock = parseInt(document.getElementById('stock').value, 10);
+    const image = document.getElementById('image').value;
+
+    const product = {
+      name: name,
+      description: description,
+      price: price,
+      stock: stock,
+      image: image
+    };
+
+    fetch('/products/add', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${jwt}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(product)
+    })
+            .then(response => {
+              if (response.ok) {
+                return response.json();
+              } else if (response.status === 403) {
+                localStorage.removeItem("jwt");
+                location.href = "/views/login"; // Redirect to login if unauthorized
+              } else {
+                throw new Error('Failed to add product, status: ' + response.status);
+              }
+            })
+            .then(data => {
+              alert('Product added successfully');
+              location.href = '/views/owned-shops-products'; // Redirect to the owned shops and products page
+            })
+            .catch(error => {
+              console.error('Error adding product:', error);
+            });
+  });
+</script>
+</body>
+</html>

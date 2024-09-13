@@ -44,7 +44,7 @@ public class PurchaseService {
         }
 
         // Initialize lazy-loaded properties
-        product.getShop().getOwner(); // Ensure initialization of owner
+        product.getShop().getUser(); // Ensure initialization of owner
 
         PurchaseRequest request = PurchaseRequest.builder()
                 .product(product)
@@ -77,7 +77,7 @@ public class PurchaseService {
         }
 
         Shop shop = request.getProduct().getShop();
-        if (!shop.getOwner().equals(currentUser)) {
+        if (!shop.getUser().equals(currentUser)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only the shop owner can accept the request");
         }
 
@@ -116,7 +116,7 @@ public class PurchaseService {
         }
 
         Shop shop = request.getProduct().getShop();
-        if (!shop.getOwner().equals(currentUser)) {
+        if (!shop.getUser().equals(currentUser)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only the shop owner can cancel the request");
         }
 

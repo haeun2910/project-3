@@ -15,10 +15,10 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("SELECT p FROM Product p WHERE " +
             "(p.name LIKE %:name% OR :name IS NULL) AND " +
             "p.price BETWEEN :minPrice AND :maxPrice AND " +
-            "p.shop.owner.active = true AND " +
+            "p.shop.user.active = true AND " +
             "p.shop.openStatus = true AND " +
             "p.shop.applicationSubmitted = true")
-    List<Product> findByNameContainingAndPriceBetweenAndShopOwnerActiveTrueAndShopOpenStatusTrueAndShopApplicationSubmittedTrue(
+    List<Product> findByNameContainingAndPriceBetweenAndShopUserActiveTrueAndShopOpenStatusTrueAndShopApplicationSubmittedTrue(
             @Param("name") String name,
             @Param("minPrice") BigDecimal minPrice,
             @Param("maxPrice") BigDecimal maxPrice);

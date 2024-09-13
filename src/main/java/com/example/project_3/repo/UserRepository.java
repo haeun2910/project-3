@@ -1,5 +1,6 @@
 package com.example.project_3.repo;
 
+import com.example.project_3.entity.Shop;
 import com.example.project_3.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -10,4 +11,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByUsername(String username);
     boolean existsByUsername(String username);
     List<User> findByBusinessApplicationTrueAndAuthorities(String authorities);
+
 }

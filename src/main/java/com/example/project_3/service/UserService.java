@@ -1,8 +1,11 @@
 package com.example.project_3.service;
 
 
+import com.example.project_3.ShopDetails;
 import com.example.project_3.UserDto;
+import com.example.project_3.entity.Shop;
 import com.example.project_3.entity.User;
+import com.example.project_3.repo.ShopRepository;
 import com.example.project_3.repo.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -24,6 +27,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -31,10 +35,12 @@ import java.util.Optional;
 public class UserService implements UserDetailsService {
     private final PasswordEncoder passwordEncoder;
     private final UserRepository repository;
+    private final ShopRepository shopRepository;
 
-    public UserService(PasswordEncoder passwordEncoder, UserRepository repository){
+    public UserService(PasswordEncoder passwordEncoder, UserRepository repository, ShopRepository shopRepository){
         this.passwordEncoder = passwordEncoder;
         this.repository = repository;
+        this.shopRepository = shopRepository;
 
 //        User hanh = new User();
 //        hanh.setUsername("haeun");
@@ -240,5 +246,8 @@ public class UserService implements UserDetailsService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have admin privileges");
         }
     }
+
+
+
 
 }

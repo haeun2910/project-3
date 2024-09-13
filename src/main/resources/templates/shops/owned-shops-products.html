@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Owned Shops and Products</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Arial', sans-serif;
+        }
+        .shop-list, .product-list {
+            margin: 20px 0;
+        }
+        .shop-item, .product-item {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .btn-update, .btn-delete {
+            margin-top: 10px;
+        }
+        .navbar {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container">
+        <a class="navbar-brand" href="/views/signin-home-page">Home</a>
+        <button class="btn btn-secondary" onclick="location.href='/views/my-profile'">My Profile</button>
+    </div>
+</nav>
+
+<div class="container">
+    <h1>Owned Shops and Products</h1>
+    <button onclick="location.href='/views/add-product'" class="btn btn-primary mb-3">Add Product</button>
+    <ul id="shop-list" class="shop-list"></ul>
+</div>
+
+<script>
+    const jwt = localStorage.getItem("jwt");
+    if (!jwt) {
+        location.href = "/views/signin-home-page"; // Redirect to home if not authenticated
+    }
+
+    // Function to handle product deletion
+    function deleteProduct(productId) {
+        fetch(`/products/${productId}`, {
+            method: "DELETE",
+            headers: {
+                "Authorization": `Bearer ${jwt}`,
+                "Content-Type": "application/json"
+            },
+        })
+            .then(response => {
+                if (response.ok) {
+                    alert('Product deleted successfully');
+                    // Refresh the page to reflect changes
+                    location.reload();
+                } else {
+                    throw new Error("Failed to delete, status: " + response.status);
+                }
+            })
+            .catch(error => {
+                console.error("Error deleting product:", error);
+            });
+    }
+
+    // Fetch owned shops and their products
+    fetch(`/shops/owned-shop`, {
+        method: "GET",
+        headers: {
+            "Authorization": `Bearer ${jwt}`,
+            "Content-Type": "application/json"
+        },
+    })
+        .then(response => {
+            if (response.ok) {
+                return response.json(); // Parse JSON response
+            } else {
+                throw new Error("Failed to fetch, status: " + response.status); // Log status code
+            }
+        })
+        .then(shops => {
+            console.log("API Response:", shops); // Debugging: Check API response
+            const shopList = document.getElementById("shop-list");
+            if (Array.isArray(shops) && shops.length > 0) {
+                shops.forEach(shop => {
+                    console.log("Shop:", shop); // Debugging: Check shop data
+                    if (shop) {
+                        const li = document.createElement('li');
+                        li.className = 'shop-item';
+                        li.innerHTML = `
+                    <h3>${shop.name || "N/A"}</h3>
+                    <p><strong>Description:</strong> ${shop.description || "N/A"}</p>
+                    <p><strong>Category:</strong> ${shop.category || "N/A"}</p>
+                    <ul class="product-list">
+                        ${Array.isArray(shop.products) && shop.products.length > 0 ? shop.products.map(product => {
+                            console.log("Product:", product); // Debugging: Check product data
+                            const price = parseFloat(product.price);
+                            const formattedPrice = isNaN(price) ? "N/A" : `$${price.toFixed(2)}`;
+                            return `
+                                <li class="product-item">
+                                    <strong>Product Name:</strong> ${product.name || "N/A"} <br>
+                                    <strong>Price:</strong> ${formattedPrice} <br>
+                                    <strong>Description:</strong> ${product.description || "N/A"} <br>
+                                    ${product.image ? `<img src="${product.image}" alt="${product.name}" style="width: 100px;">` : ""}
+                                    <a href="/views/update-product?productId=${product.id}" class="btn btn-warning btn-update">Update</a>
+                                    <button onclick="deleteProduct(${product.id})" class="btn btn-danger btn-delete">Delete</button>
+                                </li>
+                            `;
+                        }).join('') : "<li>No products available.</li>"}
+                    </ul>
+                `;
+                        shopList.appendChild(li);
+                    }
+                });
+            } else {
+                shopList.innerHTML = "<li>No shops found.</li>";
+            }
+        })
+        .catch(error => {
+            console.error("Error fetching shops and products:", error);
+        });
+</script>
+
+</body>
+</html>

@@ -90,6 +90,9 @@
             <!-- View Not Open Shops Button (only for ROLE_BUSINESS and ROLE_ADMIN) -->
             <button id="view-not-open-shops-btn" class="btn btn-info">View Not Open Shops</button>
 
+            <!-- View Owned Shops and Products Button -->
+            <button id="view-owned-shops-btn" class="btn btn-info">View My Shops and Products</button>
+
         </div>
 
         <!-- List of Owned Shops -->
@@ -221,6 +224,9 @@
     // Handle the View Not Open Shops button click
     document.getElementById("view-not-open-shops-btn").addEventListener("click", function () {
         window.location.href = "/views/not-open-shops"; // Redirect to the not open shops page
+    });
+    document.getElementById("view-owned-shops-btn").addEventListener("click", function () {
+        window.location.href = "/views/owned-shops-products"; // Redirect to the page showing owned shops and products
     });
 
     // Handle Delete Account button click

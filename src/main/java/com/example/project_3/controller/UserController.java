@@ -1,7 +1,9 @@
 package com.example.project_3.controller;
 
+import com.example.project_3.ShopDetails;
 import com.example.project_3.UserDto;
 import com.example.project_3.entity.User;
+import com.example.project_3.service.ShopService;
 import com.example.project_3.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +27,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserController {
     private final UserService service;
+    private final ShopService shopService;
+    private final UserService userService;
 
 
     @PostMapping("/create")
@@ -99,5 +103,7 @@ public class UserController {
         service.rejectBusinessApplication(userId);
         return "Rejected";
     }
+
+
 
 }

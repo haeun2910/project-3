@@ -1,12 +1,13 @@
 package com.example.project_3.service;
 
+import com.example.project_3.UserDto;
 import com.example.project_3.entity.Shop;
 import com.example.project_3.entity.User;
 import com.example.project_3.repo.ShopRepository;
 import com.example.project_3.repo.UserRepository;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -19,10 +20,12 @@ import java.util.Optional;
 public class ShopService {
     private final ShopRepository shopRepository;
     private final UserRepository userRepository;
+    private final UserService userService;
 
-    public ShopService(ShopRepository shopRepository, UserRepository userRepository) {
+    public ShopService(ShopRepository shopRepository, UserRepository userRepository, UserService userService) {
         this.shopRepository = shopRepository;
         this.userRepository = userRepository;
+        this.userService = userService;
     }
     public List<Shop> getNotOpenShops() {
         return shopRepository.findByOpenStatusTrue();
@@ -37,6 +40,25 @@ public class ShopService {
         }
         throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Shop not found");
     }
+    public Shop getShopByCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        UserDto user = userService.getUserByUsername(username); // Fetch user by username
+
+        // Assuming user has a method to get the shop
+        return shopRepository.findByUserId(user.getId()).orElseThrow();
+
+    }
+
+    public List<Shop> getOwnedShops(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        List<Shop> ownedShops = shopRepository.findByUser(user);
+
+        return ownedShops;
+    }
+
 
     public Shop updateShopForBusinessUser(Long userId, Shop shop) {
         Optional<User> userOptional = userRepository.findById(userId);
@@ -48,7 +70,7 @@ public class ShopService {
                 targetShop.setName(shop.getName());
                 targetShop.setDescription(shop.getDescription());
                 targetShop.setOpenStatus(shop.isOpenStatus());
-                targetShop.setOwner(user);  // Set the user as the owner
+                targetShop.setUser(user);  // Set the user as the owner
                 return shopRepository.save(targetShop);
             } else {
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Shop not found");
@@ -83,7 +105,7 @@ public class ShopService {
         if (userOptional.isPresent()) {
             existingShop.setOpenStatus(false);
             existingShop.setApplicationSubmitted(true);
-            existingShop.setOwner(userOptional.get());
+            existingShop.setUser(userOptional.get());
             return shopRepository.save(existingShop);
         } else {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User does not have permission");
@@ -104,12 +126,12 @@ public class ShopService {
             Shop shop = shopOptional.get();
 
             if (shop.isApplicationSubmitted()) {
-                User applicant = shop.getOwner(); // Get the user who applied
+                User applicant = shop.getUser(); // Get the user who applied
 
                 if (applicant != null) {
                     shop.setOpenStatus(true); // Set shop to open status
                     shop.setApplicationSubmitted(false); // Remove application status
-                    shop.setOwner(applicant); // Set the owner to the applicant
+                    shop.setUser(applicant); // Set the owner to the applicant
 
                     shopRepository.save(shop);
                 } else {
@@ -139,10 +161,10 @@ public class ShopService {
         Optional<Shop> shopOptional = shopRepository.findById(shopId);
         if (shopOptional.isPresent()) {
             Shop shop = shopOptional.get();
-            if (shop.getOwner() == null) {
+            if (shop.getUser() == null) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Shop owner not found");
             }
-            if (!shop.getOwner().getAuthorities().contains("ROLE_BUSINESS")) {
+            if (!shop.getUser().getAuthorities().contains("ROLE_BUSINESS")) {
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User does not have permission to close this shop");
             }
             // Set close request details

@@ -1,25 +1,31 @@
 package com.example.project_3.controller;
 
+import com.example.project_3.ShopDetails;
+import com.example.project_3.UserDto;
 import com.example.project_3.entity.Shop;
+import com.example.project_3.entity.User;
 import com.example.project_3.service.ShopService;
+import com.example.project_3.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/shops")
 public class ShopController {
     private final ShopService shopService;
+    private final UserService userService;
 
-    public ShopController(ShopService shopService) {
+    public ShopController(ShopService shopService,UserService userService) {
         this.shopService = shopService;
+        this.userService = userService;
 
     }
     @PreAuthorize("hasAnyRole('ROLE_BUSINESS','ROLE_ADMIN')")
@@ -37,6 +43,7 @@ public class ShopController {
     public Shop getShopById(@PathVariable Long id) {
         return shopService.getShopById(id);
     }
+
 
     @PreAuthorize("hasRole('ROLE_BUSINESS')")
     @PutMapping("/update")
@@ -66,7 +73,20 @@ public class ShopController {
     }
 
 
+    @GetMapping("/owned-shop")
+    @PreAuthorize("hasRole('ROLE_BUSINESS')")
+    public List<ShopDetails> getOwnedShop() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName(); // Adjust this as needed
 
+        UserDto user = userService.getUserByUsername(username); // Adjust this if necessary
+        Long userId = user.getId();
+
+        List<Shop> shops = shopService.getOwnedShops(userId);
+        return shops.stream()
+                .map(ShopDetails::fromEntity)
+                .collect(Collectors.toList());
+    }
 
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")

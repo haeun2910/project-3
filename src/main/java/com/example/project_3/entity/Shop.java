@@ -26,12 +26,12 @@ public class Shop extends BaseEntity{
     private String closeReason;
     @OneToMany(mappedBy = "shop", fetch = FetchType.LAZY)
     @JsonManagedReference
-    private final List<Product> items = new ArrayList<>();
+    private final List<Product> products = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     @JsonBackReference
-    private User owner;
+    private User user;
 
 
 

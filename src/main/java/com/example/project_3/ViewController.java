@@ -66,4 +66,17 @@ public class ViewController {
     public String shopOpenApply() {
         return "/shops/shop-open-apply.html";
     }
+
+    @GetMapping("owned-shops-products")
+    public String ownedShopProducts() {
+        return "/shops/owned-shops-products.html";
+    }
+    @GetMapping("add-product")
+    public String addProduct() {
+        return "/products/add-product.html";
+    }
+    @GetMapping("update-product")
+    public String updateProduct() {
+        return "/products/update-product.html";
+    }
 }

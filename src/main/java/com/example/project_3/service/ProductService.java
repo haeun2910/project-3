@@ -37,7 +37,9 @@ public class ProductService {
         if (!shopOptional.isPresent()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Shop not found");
         }
-        product.setShop(shopOptional.get());
+        Shop shop = shopOptional.get();
+        product.setShop(shop);
+
         return productRepository.save(product);
     }
 
@@ -87,7 +89,7 @@ public class ProductService {
         if ( !user.isActive()) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User is not active");
         }
-        List<Product> products = productRepository.findByNameContainingAndPriceBetweenAndShopOwnerActiveTrueAndShopOpenStatusTrueAndShopApplicationSubmittedTrue(name,minPrice,maxPrice);
+        List<Product> products = productRepository.findByNameContainingAndPriceBetweenAndShopUserActiveTrueAndShopOpenStatusTrueAndShopApplicationSubmittedTrue(name,minPrice,maxPrice);
         products.forEach(product -> logShopView(product.getShop(), user));
         return products;
     }

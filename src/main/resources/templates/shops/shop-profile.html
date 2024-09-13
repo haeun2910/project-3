@@ -66,8 +66,8 @@
             const tableBody = document.getElementById('products-table-body');
             tableBody.innerHTML = ''; // Clear existing content
 
-            if (json.items && Array.isArray(json.items)) {
-              json.items.forEach(item => {
+            if (json.products && Array.isArray(json.products)) {
+              json.products.forEach(item => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
 

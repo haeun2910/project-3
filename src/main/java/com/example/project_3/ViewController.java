@@ -47,8 +47,13 @@ public class ViewController {
         return "/shops/signin-home-page.html";
     }
 
-    @GetMapping("get-shop")
+    @GetMapping("get-shop/{id}")
     public String getShop() {
         return "/shops/shop-profile.html";
+    }
+
+    @GetMapping("business-application")
+    public String businessApplication() {
+        return "/users/business-application.html";
     }
 }

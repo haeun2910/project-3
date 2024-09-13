@@ -70,6 +70,7 @@ public class UserController {
         Long deleteId = service.getUserByUsername(username).getId();
         service.delete(deleteId);
     }
+    @PreAuthorize("hasRole('ROLE_USER')")
     @PostMapping("apply-business")
     public String applyForBusiness() {
         Long updateId = service.getUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName()).getId();

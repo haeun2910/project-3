@@ -33,15 +33,9 @@ public class ShopController {
         List<Shop> shops = shopService.getAllOpenedShops();
         return ResponseEntity.ok(shops);
     }
-    @GetMapping("/get-shop/{id}")
-    public ResponseEntity<Shop> getOpenedShopById(@PathVariable Long id) {
-        try {
-            Shop shop = shopService.getShopById(id);
-            return new ResponseEntity<>(shop, HttpStatus.OK);
-        } catch (ResponseStatusException e) {
-            // Handle exceptions and return appropriate error responses
-            return new ResponseEntity<>(null, e.getStatusCode());
-        }
+    @GetMapping("get-shop/{id}")
+    public Shop getShopById(@PathVariable Long id) {
+        return shopService.getShopById(id);
     }
 
     @PreAuthorize("hasRole('ROLE_BUSINESS')")

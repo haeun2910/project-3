@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Business Applications</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #f8f9fa;
+      font-family: 'Arial', sans-serif;
+    }
+    .container {
+      margin-top: 30px;
+    }
+    .application-section {
+      padding: 20px;
+      background-color: white;
+      margin: 20px 0;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    .application-list {
+      list-style-type: none;
+      padding: 0;
+    }
+    .application-item {
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    .application-item h5 {
+      margin-bottom: 5px;
+    }
+    .application-item p {
+      margin: 0;
+      color: #6c757d;
+    }
+    .btn-approve, .btn-reject {
+      margin-right: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Business Applications</h1>
+  <a href="/views/signin-home-page">HOME PAGE</a>
+  <a href="/views/my-profile">MY PROFILE</a>
+  <div class="application-section">
+    <h2>List of Applications</h2>
+    <ul id="application-list" class="application-list"></ul>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  const jwt = localStorage.getItem("jwt");
+  if (!jwt) {
+    location.href = "/views/login";
+  }
+
+  // Fetch business applications (only for ROLE_ADMIN)
+  fetch("/users/business-application", {
+    method: "GET",
+    headers: {
+      "Authorization": `Bearer ${jwt}`
+    },
+  })
+          .then(response => {
+            if (response.ok) {
+              return response.json();
+            } else if (response.status === 403) {
+              alert("You are not authorized to view this page.");
+              location.href = "/views/login";
+            } else {
+              throw new Error("Failed to fetch business applications.");
+            }
+          })
+          .then(applications => {
+            const applicationList = document.getElementById("application-list");
+
+            if (applications.length === 0) {
+              applicationList.innerHTML = "<li>No business applications found.</li>";
+            } else {
+              applications.forEach(application => {
+                const li = document.createElement('li');
+                li.classList.add('application-item');
+                li.innerHTML = `
+          <h5>Username: ${application.username || "N/A"}</h5>
+          <p><strong>Email:</strong> ${application.email || "N/A"}</p>
+          <p><strong>Full Name:</strong> ${application.fullName || "N/A"}</p>
+          <p><strong>Phone:</strong> ${application.phone || "N/A"}</p>
+          <p><strong>Nickname:</strong> ${application.nickname || "N/A"}</p>
+          <button class="btn btn-success btn-approve" onclick="approveApplication(${application.id})">Approve</button>
+          <button class="btn btn-danger btn-reject" onclick="rejectApplication(${application.id})">Reject</button>
+        `;
+                applicationList.appendChild(li);
+              });
+            }
+          })
+          .catch(error => {
+            console.error("Error fetching business applications:", error);
+            alert("Failed to fetch business applications.");
+          });
+
+  // Function to approve application
+  function approveApplication(userId) {
+    fetch(`/users/approve-business/${userId}`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${jwt}`
+      }
+    })
+            .then(response => {
+              if (response.ok) {
+                alert("Application approved.");
+                location.reload(); // Reload page after approval
+              } else {
+                throw new Error("Failed to approve the application.");
+              }
+            })
+            .catch(error => {
+              console.error("Error approving application:", error);
+              alert("Failed to approve the application.");
+            });
+  }
+
+  // Function to reject application
+  function rejectApplication(userId) {
+    fetch(`/users/reject-business/${userId}`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${jwt}`
+      }
+    })
+            .then(response => {
+              if (response.ok) {
+                alert("Application rejected.");
+                location.reload(); // Reload page after rejection
+              } else {
+                throw new Error("Failed to reject the application.");
+              }
+            })
+            .catch(error => {
+              console.error("Error rejecting application:", error);
+              alert("Failed to reject the application.");
+            });
+  }
+</script>
+
+</body>
+</html>

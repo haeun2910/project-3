@@ -72,7 +72,7 @@
             <p><strong>Phone:</strong> <span id="phone"></span></p>
             <p><strong>Nickname:</strong> <span id="nickname"></span></p>
             <p><strong>Authority Level:</strong> <span id="authorities"></span></p>
-            <p><strong>Business Application :</strong> <span id="business-application"></span></p>
+            <p><strong>Business Application:</strong> <span id="business-application"></span></p>
             <p><strong>Account Active:</strong> <span id="account-active"></span></p>
 
             <!-- Update Profile Button -->
@@ -80,6 +80,12 @@
 
             <!-- Delete Account Button -->
             <button id="delete-account-btn" class="btn btn-danger btn-delete">Delete Account</button>
+
+            <!-- Apply for Business Button (only for ROLE_USER) -->
+            <button id="apply-business-btn" class="btn btn-success">Apply for Business</button>
+
+            <!-- View Business Applications Button (only for ROLE_ADMIN) -->
+            <button id="view-applications-btn" class="btn btn-warning">View Business Applications</button>
         </div>
 
         <!-- List of Owned Shops -->
@@ -97,6 +103,7 @@
         location.href = "/views/login";
     }
 
+    // Fetch user profile details
     fetch("/users/profile", {
         method: "GET",
         headers: {
@@ -118,7 +125,7 @@
 
             // Update profile image
             const profileImg = document.getElementById("profile-img");
-            profileImg.src = user.profileImgUrl || "profile.png";
+            profileImg.src = user.profileImgUrl || "/default-profile.png";
 
             // Update user details
             document.getElementById("full-name").textContent = user.fullName || "N/A";
@@ -129,8 +136,7 @@
             document.getElementById("phone").textContent = user.phone || "N/A";
             document.getElementById("nickname").textContent = user.nickname || "N/A";
             document.getElementById("authorities").textContent = user.authorities || "N/A";
-
-            // Correctly interpret and display account active status
+            document.getElementById("business-application").textContent = user.businessApplication ? "Applied" : "Not Applied";
             document.getElementById("account-active").textContent = user.active ? 'Active' : 'Inactive';
 
             // Update list of owned shops
@@ -139,28 +145,77 @@
                 user.ownedShops.forEach(shop => {
                     const li = document.createElement('li');
                     li.innerHTML = `
-            <strong>Shop Name:</strong> ${shop.name || "N/A"} <br>
-            <strong>Description:</strong> ${shop.description || "N/A"} <br>
-            <strong>Category:</strong> ${shop.category || "N/A"}
-        `;
+                        <strong>Shop Name:</strong> ${shop.name || "N/A"} <br>
+                        <strong>Description:</strong> ${shop.description || "N/A"} <br>
+                        <strong>Category:</strong> ${shop.category || "N/A"}
+                    `;
                     shopList.appendChild(li);
                 });
             } else {
                 shopList.innerHTML = "<li>No shops owned.</li>";
             }
+
+            // Check if user has "ROLE_USER" authority
+            const hasRoleUser = user.authorities && user.authorities.includes("ROLE_USER");
+
+            // Show "Apply for Business" button only for ROLE_USER and if not already applied
+            const applyBusinessBtn = document.getElementById("apply-business-btn");
+            if (hasRoleUser && !user.businessApplication) {
+                applyBusinessBtn.style.display = "block";
+            } else {
+                applyBusinessBtn.style.display = "none";
+            }
+
+            // Check if user has "ROLE_ADMIN" authority
+            const hasRoleAdmin = user.authorities && user.authorities.includes("ROLE_ADMIN");
+
+            // Show "View Business Applications" button only for ROLE_ADMIN
+            const viewApplicationsBtn = document.getElementById("view-applications-btn");
+            if (hasRoleAdmin) {
+                viewApplicationsBtn.style.display = "block";
+            } else {
+                viewApplicationsBtn.style.display = "none";
+            }
         })
         .catch(error => {
             console.error("Error fetching user profile:", error);
-            // Optionally, display an error message to the user
         });
 
+    // Apply for Business logic
+    document.getElementById("apply-business-btn").addEventListener("click", function () {
+        fetch("/users/apply-business", {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${jwt}`
+            },
+        })
+            .then(response => {
+                if (response.ok) {
+                    alert("Business application successful");
+                    document.getElementById("business-application").textContent = "Applied";
+                    document.getElementById("apply-business-btn").style.display = "none"; // Hide the button
+                } else {
+                    throw new Error("Business application failed");
+                }
+            })
+            .catch(error => {
+                console.error("Error applying for business:", error);
+                alert("Failed to apply for business. Please try again later.");
+            });
+    });
+
+    // Handle View Business Applications button click (for ROLE_ADMIN)
+    document.getElementById("view-applications-btn").addEventListener("click", function () {
+        window.location.href = "/views/business-application"; // Redirect to the business applications page
+    });
+
     // Handle the Update Profile button click
-    document.getElementById("update-profile-btn").addEventListener("click", function() {
+    document.getElementById("update-profile-btn").addEventListener("click", function () {
         window.location.href = "/views/user-update"; // Replace with the actual URL of your update profile page
     });
 
     // Handle Delete Account button click
-    document.getElementById("delete-account-btn").addEventListener("click", function() {
+    document.getElementById("delete-account-btn").addEventListener("click", function () {
         if (confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
             fetch("/users/delete", {
                 method: "DELETE",

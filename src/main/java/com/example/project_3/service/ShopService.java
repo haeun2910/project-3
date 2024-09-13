@@ -30,6 +30,13 @@ public class ShopService {
     public List<Shop> getAllOpenedShops(){
         return shopRepository.findByOpenStatusTrue();
     }
+    public Shop getShopById(Long id) {
+        Optional<Shop> optionalShop = shopRepository.findById(id);
+        if (optionalShop.isPresent()) {
+            return optionalShop.get();
+        }
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Shop not found");
+    }
 
     public Shop updateShopForBusinessUser(Long userId, Shop shop) {
         Optional<User> userOptional = userRepository.findById(userId);

@@ -13,7 +13,6 @@
 <table>
   <thead>
   <tr>
-    <th>ID</th>
     <th>Name</th>
     <th>Description</th>
     <th>Price</th>
@@ -38,6 +37,7 @@
   const shopId = pathSplit[pathSplit.length - 1];
 
   // Fetch shop details from the server
+  // Fetch shop details from the server
   fetch(`/shops/get-shop/${shopId}`, {
     method: "GET",
     headers: {
@@ -56,7 +56,7 @@
             }
           })
           .then(json => {
-            console.log(json);
+            console.log(json);  // Log the response data to check if items are available
             // Update HTML with shop data
             document.getElementById("shop-name").textContent = json.name || "Shop Name not available";
             document.getElementById("shop-category").textContent = json.category || "Category not available";
@@ -66,15 +66,15 @@
             const tableBody = document.getElementById('products-table-body');
             tableBody.innerHTML = ''; // Clear existing content
 
-            if (json.products && Array.isArray(json.products)) {
-              json.products.forEach(product => {
+            if (json.items && Array.isArray(json.items)) {
+              json.items.forEach(item => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${product.id}</td>
-                    <td>${product.name}</td>
-                    <td>${product.description}</td>
-                    <td>${product.price}</td>
-                `;
+
+          <td>${item.name}</td>
+          <td>${item.description}</td>
+          <td>${item.price}</td>
+        `;
                 tableBody.appendChild(row);
               });
             } else {

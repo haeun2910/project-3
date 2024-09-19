@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Update Product</title>
+    <title>Update/Delete Product</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
@@ -17,9 +17,10 @@
 </head>
 <body>
 <div class="container">
-    <h1>Update Product</h1>
-    <form id="update-product-form">
+    <h1>Update</h1>
+    <form id="product-form">
         <input type="hidden" id="productId">
+
         <div class="mb-3">
             <label for="name" class="form-label">Product Name</label>
             <input type="text" id="name" class="form-control" required>
@@ -40,7 +41,9 @@
             <label for="image" class="form-label">Image URL</label>
             <input type="url" id="image" class="form-control">
         </div>
+
         <button type="submit" class="btn btn-primary">Update Product</button>
+        <button type="button" id="delete-button" class="btn btn-danger">Delete Product</button>
     </form>
 </div>
 
@@ -80,8 +83,8 @@
             });
     }
 
-    // Handle form submission
-    document.getElementById('update-product-form').addEventListener('submit', function(event) {
+    // Handle form submission for updating product
+    document.getElementById('product-form').addEventListener('submit', function(event) {
         event.preventDefault();
 
         const jwt = localStorage.getItem("jwt");
@@ -105,7 +108,7 @@
             image: image
         };
 
-        fetch(`/products/update/${productId}`, {
+        fetch(`/products/update`, {
             method: 'PUT',
             headers: {
                 'Authorization': `Bearer ${jwt}`,
@@ -118,20 +121,19 @@
                     return response.json();
                 } else if (response.status === 403) {
                     localStorage.removeItem("jwt");
-                    location.href = "/views/login"; // Redirect to login if unauthorized
+                    location.href = "/views/signin-home-page"; // Redirect to login if unauthorized
                 } else {
                     throw new Error('Failed to update product, status: ' + response.status);
                 }
             })
             .then(data => {
                 alert('Product updated successfully');
-                // Optionally, redirect or clear the form
-                location.href = "/views/owned-shops-products"; // Redirect to the owned shops and products page
             })
             .catch(error => {
                 console.error('Error updating product:', error);
             });
     });
+
 
     // Load product details when the page loads
     window.onload = function() {

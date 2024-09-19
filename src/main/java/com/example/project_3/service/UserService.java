@@ -1,9 +1,7 @@
 package com.example.project_3.service;
 
 
-import com.example.project_3.ShopDetails;
-import com.example.project_3.UserDto;
-import com.example.project_3.entity.Shop;
+import com.example.project_3.dto.UserDto;
 import com.example.project_3.entity.User;
 import com.example.project_3.repo.ShopRepository;
 import com.example.project_3.repo.UserRepository;
@@ -27,7 +25,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service

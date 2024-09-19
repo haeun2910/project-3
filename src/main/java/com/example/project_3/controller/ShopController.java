@@ -1,9 +1,8 @@
 package com.example.project_3.controller;
 
-import com.example.project_3.ShopDetails;
-import com.example.project_3.UserDto;
+import com.example.project_3.dto.ShopDetails;
+import com.example.project_3.dto.UserDto;
 import com.example.project_3.entity.Shop;
-import com.example.project_3.entity.User;
 import com.example.project_3.service.ShopService;
 import com.example.project_3.service.UserService;
 import org.springframework.http.HttpStatus;

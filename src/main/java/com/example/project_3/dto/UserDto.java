@@ -1,6 +1,5 @@
-package com.example.project_3;
+package com.example.project_3.dto;
 
-import com.example.project_3.entity.Shop;
 import com.example.project_3.entity.User;
 import lombok.Getter;
 import lombok.Setter;

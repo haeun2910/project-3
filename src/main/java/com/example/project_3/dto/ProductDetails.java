@@ -1,4 +1,4 @@
-package com.example.project_3;
+package com.example.project_3.dto;
 
 import com.example.project_3.entity.Product;
 import lombok.Getter;

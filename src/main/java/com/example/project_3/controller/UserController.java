@@ -1,20 +1,15 @@
 package com.example.project_3.controller;
 
-import com.example.project_3.ShopDetails;
-import com.example.project_3.UserDto;
+import com.example.project_3.dto.UserDto;
 import com.example.project_3.entity.User;
 import com.example.project_3.service.ShopService;
 import com.example.project_3.service.UserService;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;

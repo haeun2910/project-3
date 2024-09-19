@@ -1,5 +1,6 @@
 package com.example.project_3.service;
 
+import com.example.project_3.dto.ProductDto;
 import com.example.project_3.entity.Product;
 import com.example.project_3.entity.Shop;
 import com.example.project_3.entity.ShopViewLog;
@@ -18,6 +19,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -32,47 +34,31 @@ public class ProductService {
         this.userRepository = userRepository;
         this.shopViewRepository = shopViewRepository;
     }
-    public Product addProduct(Long shopId, Product product) {
-        Optional<Shop> shopOptional = shopRepository.findById(shopId);
-        if (!shopOptional.isPresent()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Shop not found");
-        }
-        Shop shop = shopOptional.get();
-        product.setShop(shop);
-
+    public Product addProduct(Product product) {
         return productRepository.save(product);
     }
 
-    public Product updateProduct(Long productId, Long shopId, Product updatedProduct) {
-        Optional<Product> productOptional = productRepository.findById(productId);
-        if (productOptional.isPresent()) {
-            Product product = productOptional.get();
+    public Product getProductById(Long id) {
+        return productRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
+    }
 
-            // Check if the product belongs to the given shop
-            if (!product.getShop().getId().equals(shopId)) {
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Product does not belong to the specified shop");
-            }
-
-            // Update product details
-            product.setName(updatedProduct.getName());
-            product.setImage(updatedProduct.getImage());
-            product.setDescription(updatedProduct.getDescription());
-            product.setPrice(updatedProduct.getPrice());
-            product.setStock(updatedProduct.getStock());
-
-            return productRepository.save(product);
-        } else {
+    public Product updateProduct(Product product) {
+        // Ensure the product exists before updating
+        if (!productRepository.existsById(product.getId())) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found");
         }
+        return productRepository.save(product);
     }
 
 
-    public void deleteProduct(Long productId) {
-        if (productRepository.existsById(productId)) {
-            productRepository.deleteById(productId);
-        } else {
+    public void deleteProduct(Long id) {
+        // Check if the product exists
+        if (!productRepository.existsById(id)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found");
         }
+        // Delete the product
+        productRepository.deleteById(id);
     }
 
     public List<Product> getProductsByShop(Long shopId) {
@@ -84,29 +70,12 @@ public class ProductService {
         }
     }
 
-    public List<Product> searchProducts(String name, BigDecimal minPrice, BigDecimal maxPrice, Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-        if ( !user.isActive()) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User is not active");
-        }
-        List<Product> products = productRepository.findByNameContainingAndPriceBetweenAndShopUserActiveTrueAndShopOpenStatusTrueAndShopApplicationSubmittedTrue(name,minPrice,maxPrice);
-        products.forEach(product -> logShopView(product.getShop(), user));
-        return products;
+    public List<ProductDto> searchProducts(String name, Double minPrice, Double maxPrice) {
+        List<Product> products = productRepository.findByNameContainingAndPriceBetween(name, minPrice, maxPrice);
+        return products.stream()
+                .map(ProductDto::new)
+                .collect(Collectors.toList());
     }
 
-    private void logShopView(Shop shop, User user) {
-        ShopViewLog log = new ShopViewLog();
-        log.setShop(shop);
-        log.setUser(user);
-        log.setViewedAt(LocalDateTime.now());
-        shopViewRepository.save(log);
-    }
-
-    public List<ShopViewLog> getRecentShopViews(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-
-        return shopViewRepository.findTop5ByUserOrderByViewedAtDesc(user);
-    }
 
 }

@@ -1,5 +1,6 @@
 package com.example.project_3.entity;
 
+import com.example.project_3.RequestStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -11,7 +12,11 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@Table(name = "purchase_request")
 public class PurchaseRequest extends BaseEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
     private Product product;
@@ -21,15 +26,10 @@ public class PurchaseRequest extends BaseEntity {
     private User user;
 
     private Integer quantity;
-    private BigDecimal totalPrice;
-    private boolean isAccepted;
-    private boolean isCancelled;
+    private BigDecimal totalAmount;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private RequestStatus status ;
 
-    @PrePersist
-    protected void onCreate() {
-        // Calculate totalPrice based on quantity and product price
-        if (product != null && quantity != null) {
-            this.totalPrice = product.getPrice().multiply(BigDecimal.valueOf(quantity));
-        }
-    }
+
 }

@@ -18,8 +18,5 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             "p.shop.user.active = true AND " +
             "p.shop.openStatus = true AND " +
             "p.shop.applicationSubmitted = true")
-    List<Product> findByNameContainingAndPriceBetweenAndShopUserActiveTrueAndShopOpenStatusTrueAndShopApplicationSubmittedTrue(
-            @Param("name") String name,
-            @Param("minPrice") BigDecimal minPrice,
-            @Param("maxPrice") BigDecimal maxPrice);
+    List<Product> findByNameContainingAndPriceBetween(String name, Double minPrice, Double maxPrice);
 }

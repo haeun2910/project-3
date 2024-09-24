@@ -1195,14 +1195,14 @@
 			"name": "purchases",
 			"item": [
 				{
-					"name": "POST request",
+					"name": "POST create",
 					"request": {
 						"auth": {
 							"type": "bearer",
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJicmFkIiwiaWF0IjoxNzI2MDI5NTA2LCJleHAiOjE3MjY2MzQzMDZ9.ZDeEyaHNKZjuvwWVV1HuRBwwKMTnebUDFdxJEvuq-umvODT6o5-lXax5DHkQej21",
+									"value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJjaGFkIiwiaWF0IjoxNzI3MTQ5ODUwLCJleHAiOjE3Mjc3NTQ2NTB9.ry4DlFqswq_HVY98M0QVPpgxn6E0aphR93zRi3be0QQlux4gFsPnNu3iXo6z4aqZ",
 									"type": "string"
 								}
 							]
@@ -1211,7 +1211,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "\n{\n  \"id\": 1,\n  \"product\": {\n    \"id\": 1,\n    \"name\": \"Product 1\",\n    \"description\": \"Description for Product 1\",\n    \"price\": 100.00,\n    \"stock\": 50\n  },\n  \"user\": {\n    \"id\": 5,\n    \"username\": \"brad\",\n    \"active\": true\n  },\n  \"quantity\": 2,\n  \"isAccepted\": false,\n  \"isCancelled\": false",
+							"raw": "{\n  \"productId\": 1,\n  \"quantity\": 2,\n  \"deliveryAddress\": \"123 Main St, City, Country\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1219,7 +1219,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8080/purchases/request?productId=1&quantity=2&userId=5",
+							"raw": "http://localhost:8080/purchases/create",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -1227,21 +1227,7 @@
 							"port": "8080",
 							"path": [
 								"purchases",
-								"request"
-							],
-							"query": [
-								{
-									"key": "productId",
-									"value": "1"
-								},
-								{
-									"key": "quantity",
-									"value": "2"
-								},
-								{
-									"key": "userId",
-									"value": "5"
-								}
+								"create"
 							]
 						}
 					},
@@ -1263,7 +1249,7 @@
 						"method": "POST",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/purchases/accept?requestId=1&currentUserId=4",
+							"raw": "http://localhost:8080/purchases/accept?requestId=1",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -1277,10 +1263,6 @@
 								{
 									"key": "requestId",
 									"value": "1"
-								},
-								{
-									"key": "currentUserId",
-									"value": "4"
 								}
 							]
 						}
@@ -1303,7 +1285,7 @@
 						"method": "POST",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/purchases/cancel?requestId=1&currentUserId=4",
+							"raw": "http://localhost:8080/purchases/cancel?requestId=1",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -1317,126 +1299,7 @@
 								{
 									"key": "requestId",
 									"value": "1"
-								},
-								{
-									"key": "currentUserId",
-									"value": "4"
 								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "POST payments request",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJ0cmFuTGFtIiwiaWF0IjoxNzI2MDIwMjYyLCJleHAiOjE3MjY2MjUwNjJ9.IxH8pQGQ_lmLea_Zw369-xIu180lCz3EgcC8DINFBLtzcD4Vp-dUtvR9lI8-i5gW",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [],
-						"url": {
-							"raw": "http://localhost:8080/payments/submit?requestId=1&amount=100.00",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"payments",
-								"submit"
-							],
-							"query": [
-								{
-									"key": "requestId",
-									"value": "1"
-								},
-								{
-									"key": "amount",
-									"value": "100.00"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "POST payments/confirm",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJ0cmFuTGFtIiwiaWF0IjoxNzI2MDIwMjYyLCJleHAiOjE3MjY2MjUwNjJ9.IxH8pQGQ_lmLea_Zw369-xIu180lCz3EgcC8DINFBLtzcD4Vp-dUtvR9lI8-i5gW",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [],
-						"url": {
-							"raw": "http://localhost:8080/payments/confirm?paymentId=1",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"payments",
-								"confirm"
-							],
-							"query": [
-								{
-									"key": "paymentId",
-									"value": "1"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "purchases/create",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJjaGFkIiwiaWF0IjoxNzI2Mzg4MTE2LCJleHAiOjE3MjY5OTI5MTZ9.6Rbi2jUMKi1OZDtOJaPxlcrvueRcxjZ1o3D41-_UIQu4x2M4jcMJBEZ8pFxlGJQJ",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"productId\": 1,\n    \"userId\": 2,\n    \"quantity\": 2,\n    \"totalAmount\": 200.00,\n    \"status\": \"PENDING\" // Ensure this matches your enum values\n}\n",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:8080/purchases/create",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"purchases",
-								"create"
 							]
 						}
 					},
